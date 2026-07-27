@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rizoma — Um conteúdo. Todas as direções.</title>
+  <meta name="description" content="Sua ferramenta pessoal de crescimento orgânico para criadores de conteúdo. Gere assets para todas as plataformas com um clique." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">🌿</div>
+    <div class="logo-text">
+      <span class="logo-name">Rizoma</span>
+      <span class="logo-tagline">GrowthBot AI</span>
+    </div>
+  </div>
+
+  <div class="channel-wrapper">
+    <div class="channel-label">Canal Ativo</div>
+    <div class="channel-row">
+      <select id="channelSelect" class="channel-select">
+        <option value="">— Selecione —</option>
+      </select>
+      <button class="btn-icon-round" id="editChannelBtn" onclick="openEditChannel()" title="Editar canal" style="display:none">✏️</button>
+    </div>
+    <button class="btn-new-channel" onclick="openModal('channelModal', 'create')">+ Novo Canal</button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+      <span class="nav-icon">🏠</span><span>Dashboard</span>
+    </a>
+    <a class="nav-item" data-page="historico" onclick="showPage('historico')">
+      <span class="nav-icon">📚</span><span>Histórico</span>
+    </a>
+    <a class="nav-item" data-page="ideias" onclick="showPage('ideias')">
+      <span class="nav-icon">💡</span><span>Ideias</span>
+    </a>
+    <a class="nav-item" data-page="config" onclick="showPage('config')">
+      <span class="nav-icon">⚙️</span><span>Configurações</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="version-badge">v1.0.0</div>
+  </div>
+</aside>
+
+<!-- ════════════════════════════════════════════════════════ MAIN CONTENT -->
+<main class="main-content">
+
+  <!-- ░░░ DASHBOARD ░░░ -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-header">
+      <div>
+        <h1 id="dashTitle">Dashboard</h1>
+        <p class="page-subtitle" id="dashSubtitle">Selecione um canal para começar</p>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+
+      <!-- BLOCO 1: Criar Conteúdo -->
+      <div class="card card-create">
+        <div class="card-header">
+          <h2 class="card-title">⚡ Criar Conteúdo</h2>
+          <div class="mode-toggle">
+            <button class="mode-btn active" id="btnPos" onclick="setMode('pos')">📦 Pós</button>
+            <button class="mode-btn" id="btnPre" onclick="setMode('pre')">🎯 Pré</button>
+          </div>
+        </div>
+        <p class="mode-hint" id="modeHint">Pós-produção — gere todos os assets para um vídeo já gravado</p>
+        <textarea
+          id="temaInput"
+          class="tema-textarea"
+          placeholder="Ex: Top 5 jogos mais viciantes de 2025&#10;&#10;Pode ser um título, ideia ou descrição do conteúdo..."
+          rows="4"
+        ></textarea>
+        <button class="btn-generate" id="generateBtn" onclick="gerarConteudo()">
+          <span id="generateBtnText">🚀 Gerar Conteúdo</span>
+        </button>
+      </div>
+
+      <!-- BLOCO 2: Tendências -->
+      <div class="card card-trends">
+        <div class="card-header">
+          <h2 class="card-title">🔥 Tendências do Dia</h2>
+          <button class="btn-refresh" onclick="loadTrends()" title="Atualizar tendências">↻</button>
+        </div>
+        <div id="trendsList" class="trends-list">
+          <div class="empty-msg">Selecione um canal</div>
+        </div>
+      </div>
+
+      <!-- BLOCO 3: Ideias -->
+      <div class="card card-ideas">
+        <div class="card-header">
+          <h2 class="card-title">💡 Ideias Salvas</h2>
+          <button class="btn-add-small" onclick="openModal('ideiaModal')" title="Nova ideia">+</button>
+        </div>
+        <div id="ideiasDash" class="ideas-dash">
+          <div class="empty-msg">Selecione um canal</div>
+        </div>
+        <a class="link-ver-todos" onclick="showPage('ideias')">Ver todas as ideias →</a>
+      </div>
+
+      <!-- BLOCO 4: Últimos Conteúdos -->
+      <div class="card card-recent">
+        <div class="card-header">
+          <h2 class="card-title">📋 Recentes</h2>
+          <a class="link-ver-todos-inline" onclick="showPage('historico')">Ver todos →</a>
+        </div>
+        <div id="recentList" class="recent-list">
+          <div class="empty-msg">Nenhum conteúdo ainda</div>
+        </div>
+      </div>
+
+    </div><!-- /dashboard-grid -->
+
+    <!-- ÁREA DE RESULTADO -->
+    <div id="resultsSection" class="results-section" style="display:none">
+      <div class="results-header">
+        <div class="results-title-group">
+          <h2 class="results-title">✨ Conteúdo Gerado</h2>
+          <span class="results-meta" id="resultsMeta"></span>
+        </div>
+        <button class="btn-close-results" onclick="closeResults()">✕ Fechar</button>
+      </div>
+
+      <div id="demoWarning" class="demo-banner" style="display:none">
+        ⚠️ <strong>Modo Demonstração</strong> — Configure sua chave de API em
+        <a onclick="showPage('config')" style="cursor:pointer;color:var(--accent)">⚙️ Configurações</a>
+        para gerar conteúdo real com IA. Google Gemini é gratuito!
+      </div>
+
+      <div class="tabs-wrapper">
+        <div class="tabs" id="resultsTabs">
+          <button class="tab active" data-tab="youtube"   onclick="switchTab('youtube')">📹 YouTube</button>
+          <button class="tab" data-tab="instagram" onclick="switchTab('instagram')">📸 Instagram</button>
+          <button class="tab" data-tab="x_twitter" onclick="switchTab('x_twitter')">🐦 X/Thread</button>
+          <button class="tab" data-tab="linkedin"  onclick="switchTab('linkedin')">💼 LinkedIn</button>
+          <button class="tab" data-tab="facebook"  onclick="switchTab('facebook')">📘 Facebook</button>
+          <button class="tab" data-tab="short_reel" onclick="switchTab('short_reel')">✂️ Short/Reel</button>
+          <button class="tab" data-tab="tiktok"    onclick="switchTab('tiktok')">🎵 TikTok</button>
+          <button class="tab" data-tab="telegram"  onclick="switchTab('telegram')">✈️ Telegram</button>
+          <button class="tab" data-tab="thumbnail" onclick="switchTab('thumbnail')">🖼️ Thumbnail</button>
+          <button class="tab" data-tab="blog"      onclick="switchTab('blog')">📝 Blog</button>
+          <button class="tab tab-roteiro" data-tab="roteiro_completo" onclick="switchTab('roteiro_completo')" style="display:none">🎬 Roteiro</button>
+        </div>
+      </div>
+
+      <div id="tabContent" class="tab-content"></div>
+    </div>
+
+  </div><!-- /page-dashboard -->
+
+  <!-- ░░░ HISTÓRICO ░░░ -->
+  <div id="page-historico" class="page">
+    <div class="page-header">
+      <div>
+        <h1>📚 Histórico</h1>
+        <p class="page-subtitle">Todos os conteúdos gerados</p>
+      </div>
+    </div>
+    <div id="historicoList" class="history-list">
+      <div class="empty-msg centered">Nenhum conteúdo gerado ainda.</div>
+    </div>
+  </div>
+
+  <!-- ░░░ IDEIAS ░░░ -->
+  <div id="page-ideias" class="page">
+    <div class="page-header">
+      <div>
+        <h1>💡 Ideias</h1>
+        <p class="page-subtitle">Suas ideias de conteúdo</p>
+      </div>
+      <button class="btn-primary-sm" onclick="openModal('ideiaModal')">+ Nova Ideia</button>
+    </div>
+    <div id="ideiasPageList" class="ideas-page-list">
+      <div class="empty-msg centered">Selecione um canal e adicione suas ideias.</div>
+    </div>
+  </div>
+
+  <!-- ░░░ CONFIGURAÇÕES ░░░ -->
+  <div id="page-config" class="page">
+    <div class="page-header">
+      <div>
+        <h1>⚙️ Configurações</h1>
+        <p class="page-subtitle">Configure seu provedor de IA</p>
+      </div>
+    </div>
+
+    <div class="config-card">
+      <h3 class="config-section-title">🤖 Provedor de Inteligência Artificial</h3>
+
+      <div class="config-grid">
+        <div class="form-group">
+          <label class="form-label">Provedor</label>
+          <select id="cfgProvider" class="form-control" onchange="onProviderChange()">
+            <option value="demo">Demo (sem API — apenas visualização)</option>
+            <option value="gemini">Google Gemini (Recomendado — Gratuito)</option>
+            <option value="openai">OpenAI GPT (Pago)</option>
+            <option value="ollama">Ollama (Local — 100% Gratuito)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Gemini section -->
+      <div id="geminiSection" class="provider-section" style="display:none">
+        <div class="config-grid">
+          <div class="form-group">
+            <label class="form-label">Modelo Gemini</label>
+            <select id="cfgGeminiModel" class="form-control">
+              <option value="gemini-3.5-flash">gemini-3.5-flash — Rápido e gratuito ⚡</option>
+              <option value="gemini-3.5-pro">gemini-3.5-pro — Melhor qualidade</option>
+              <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp — Experimental</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              Chave de API Gemini
+              <a href="https://makersuite.google.com/app/apikey" target="_blank" class="link-get-key">Obter chave gratuita →</a>
+            </label>
+            <input type="password" id="cfgGeminiKey" class="form-control" placeholder="AIza..." autocomplete="off" />
+            <small class="form-hint" id="geminiKeyStatus"></small>
+          </div>
+        </div>
+      </div>
+
+      <!-- OpenAI section -->
+      <div id="openaiSection" class="provider-section" style="display:none">
+        <div class="config-grid">
+          <div class="form-group">
+            <label class="form-label">Modelo OpenAI</label>
+            <select id="cfgOpenaiModel" class="form-control">
+              <option value="gpt-4o-mini">gpt-4o-mini — Rápido e econômico ⚡</option>
+              <option value="gpt-4o">gpt-4o — Melhor qualidade</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">
+              Chave de API OpenAI
+              <a href="https://platform.openai.com/api-keys" target="_blank" class="link-get-key">Obter chave →</a>
+            </label>
+            <input type="password" id="cfgOpenaiKey" class="form-control" placeholder="sk-..." autocomplete="off" />
+            <small class="form-hint" id="openaiKeyStatus"></small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ollama section -->
+      <div id="ollamaSection" class="provider-section" style="display:none">
+        <div class="config-grid">
+          <div class="form-group">
+            <label class="form-label">URL do Ollama</label>
+            <input type="text" id="cfgOllamaUrl" class="form-control" value="http://localhost:11434" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo Ollama</label>
+            <input type="text" id="cfgOllamaModel" class="form-control" placeholder="llama3, mistral, gemma..." value="llama3" />
+          </div>
+        </div>
+        <div class="info-box">
+          🦙 Para usar o Ollama, instale em <a href="https://ollama.ai" target="_blank">ollama.ai</a> e execute: <code>ollama run llama3</code>
+        </div>
+      </div>
+
+      <button class="btn-save-config" onclick="saveConfig()">💾 Salvar Configurações</button>
+    </div>
+
+    <div class="config-card">
+      <h3 class="config-section-title">📖 Como Configurar</h3>
+      <div class="how-to">
+        <div class="how-to-item">
+          <div class="how-to-num">1</div>
+          <div>
+            <strong>Google Gemini (Recomendado)</strong><br>
+            Acesse <a href="https://makersuite.google.com/app/apikey" target="_blank">makersuite.google.com</a>,
+            faça login com sua conta Google, crie uma chave gratuita e cole aqui. Sem cartão de crédito necessário.
+          </div>
+        </div>
+        <div class="how-to-item">
+          <div class="how-to-num">2</div>
+          <div>
+            <strong>OpenAI GPT</strong><br>
+            Acesse <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>,
+            crie uma chave e adicione crédito na sua conta. O modelo <code>gpt-4o-mini</code> é o mais econômico.
+          </div>
+        </div>
+        <div class="how-to-item">
+          <div class="how-to-num">3</div>
+          <div>
+            <strong>Ollama (Local)</strong><br>
+            Instale o <a href="https://ollama.ai" target="_blank">Ollama</a> no seu PC,
+            execute <code>ollama run llama3</code> no terminal e configure aqui. 100% gratuito e offline.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div><!-- /page-config -->
+
+</main><!-- /main-content -->
+
+
+<!-- ═══════════════════════════════════════════════════════════ MODAIS -->
+
+<!-- Modal: Canal -->
+<div id="channelModal" class="modal" style="display:none">
+  <div class="modal-overlay" onclick="closeModal('channelModal')"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="channelModalTitle">Novo Canal</h2>
+      <button class="btn-modal-close" onclick="closeModal('channelModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="channelId" />
+
+      <div class="form-group">
+        <label class="form-label">Nome do canal <span class="required">*</span></label>
+        <input type="text" id="channelNome" class="form-control" placeholder="Ex: Games com João, TechBrasil..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nicho <span class="required">*</span></label>
+        <input type="text" id="channelNicho" class="form-control" placeholder="Ex: Games, Tecnologia, Reflexões, Marketing..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tom de voz <span class="required">*</span></label>
+        <input type="text" id="channelTom" class="form-control" placeholder="Ex: Descontraído e informativo, Técnico mas acessível..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Público-alvo <span class="required">*</span></label>
+        <input type="text" id="channelPublico" class="form-control" placeholder="Ex: Jovens de 18-30 que gostam de games e tecnologia..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Plataformas ativas</label>
+        <div class="platforms-grid">
+          <label class="platform-check"><input type="checkbox" value="YouTube" checked> YouTube</label>
+          <label class="platform-check"><input type="checkbox" value="Instagram" checked> Instagram</label>
+          <label class="platform-check"><input type="checkbox" value="TikTok"> TikTok</label>
+          <label class="platform-check"><input type="checkbox" value="X (Twitter)"> X/Twitter</label>
+          <label class="platform-check"><input type="checkbox" value="LinkedIn"> LinkedIn</label>
+          <label class="platform-check"><input type="checkbox" value="Facebook"> Facebook</label>
+          <label class="platform-check"><input type="checkbox" value="Telegram"> Telegram</label>
+          <label class="platform-check"><input type="checkbox" value="Pinterest"> Pinterest</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary-sm" onclick="closeModal('channelModal')">Cancelar</button>
+      <button class="btn-primary-sm" onclick="saveChannel()">💾 Salvar Canal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Ideia -->
+<div id="ideiaModal" class="modal" style="display:none">
+  <div class="modal-overlay" onclick="closeModal('ideiaModal')"></div>
+  <div class="modal-box modal-sm">
+    <div class="modal-header">
+      <h2>💡 Nova Ideia</h2>
+      <button class="btn-modal-close" onclick="closeModal('ideiaModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Tema da ideia</label>
+        <textarea id="ideiaText" class="form-control" rows="3"
+          placeholder="Descreva sua ideia de conteúdo..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Potencial</label>
+        <div class="star-rating" id="starRating">
+          <span class="star active" data-val="1" onclick="setStars(1)">★</span>
+          <span class="star active" data-val="2" onclick="setStars(2)">★</span>
+          <span class="star active" data-val="3" onclick="setStars(3)">★</span>
+          <span class="star" data-val="4" onclick="setStars(4)">★</span>
+          <span class="star" data-val="5" onclick="setStars(5)">★</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary-sm" onclick="closeModal('ideiaModal')">Cancelar</button>
+      <button class="btn-primary-sm" onclick="saveIdeia()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Histórico Detalhe -->
+<div id="histDetailModal" class="modal" style="display:none">
+  <div class="modal-overlay" onclick="closeModal('histDetailModal')"></div>
+  <div class="modal-box modal-xl">
+    <div class="modal-header">
+      <h2 id="histDetailTitle">Conteúdo</h2>
+      <button class="btn-modal-close" onclick="closeModal('histDetailModal')">✕</button>
+    </div>
+    <div class="modal-body" id="histDetailBody"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" class="toast"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>
