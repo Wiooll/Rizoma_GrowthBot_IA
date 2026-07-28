@@ -279,7 +279,7 @@ async def generate_content(tema: str, canal: dict, modo: str) -> dict:
             raise ValueError(
                 "Chave do Gemini não configurada. Acesse ⚙️ Configurações."
             )
-        model = llm.get("gemini_model", "gemini-1.5-flash")
+        model = llm.get("gemini_model", "gemini-3.1-flash-lite")
         return await _call_gemini(prompt, api_key, model)
 
     elif provider == "openai":

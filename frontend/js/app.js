@@ -693,7 +693,7 @@ async function loadConfig() {
   try {
     const cfg = await api.get('/api/config');
     document.getElementById('cfgProvider').value = cfg.provider || 'demo';
-    document.getElementById('cfgGeminiModel').value = cfg.gemini_model || 'gemini-3.5-flash';
+    document.getElementById('cfgGeminiModel').value = cfg.gemini_model || 'gemini-3.1-flash-lite';
     document.getElementById('cfgOpenaiModel').value = cfg.openai_model || 'gpt-4o-mini';
     document.getElementById('cfgOllamaUrl').value = cfg.ollama_url || 'http://localhost:11434';
     document.getElementById('cfgOllamaModel').value = cfg.ollama_model || 'llama3';

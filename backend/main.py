@@ -165,7 +165,7 @@ async def get_config():
     # Mascara as chaves de API
     safe = {
         "provider": llm.get("provider", "demo"),
-        "gemini_model": llm.get("gemini_model", "gemini-3.5-flash"),
+        "gemini_model": llm.get("gemini_model", "gemini-3.1-flash-lite"),
         "openai_model": llm.get("openai_model", "gpt-4o-mini"),
         "ollama_url": llm.get("ollama_url", "http://localhost:11434"),
         "ollama_model": llm.get("ollama_model", "llama3"),
@@ -177,7 +177,7 @@ async def get_config():
 
 class ConfigPayload(BaseModel):
     provider: str
-    gemini_model: Optional[str] = "gemini-3.5-flash"
+    gemini_model: Optional[str] = "gemini-3.1-flash-lite"
     gemini_api_key: Optional[str] = ""
     openai_model: Optional[str] = "gpt-4o-mini"
     openai_api_key: Optional[str] = ""
