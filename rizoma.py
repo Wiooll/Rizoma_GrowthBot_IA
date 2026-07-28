@@ -33,11 +33,12 @@ def print_banner():
 
     banner = """
   ==========================================
-         R I Z O M A  -  v1.0.0
+         R I Z O M A  -  v1.0.1
       Um conteudo. Todas as direcoes.
   ==========================================
 
-  Acesse: http://127.0.0.1:8000
+  Acesse Local: http://127.0.0.1:8000
+  Acesse na Rede: http://<seu-ip-local>:8000
   Pressione Ctrl+C para encerrar
 """
     print(banner)
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     # Inicia servidor FastAPI
     uvicorn.run(
         "backend.main:app",
-        host="127.0.0.1",
+        host="0.0.0.0",
         port=8000,
         reload=False,
         log_level="warning",

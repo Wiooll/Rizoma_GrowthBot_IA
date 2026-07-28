@@ -29,7 +29,8 @@ pip install -r requirements.txt
 python rizoma.py
 ```
 
-O navegador abrirá automaticamente em `http://127.0.0.1:8000`.
+O navegador abrirá automaticamente em `http://127.0.0.1:8000` (acesso local).
+Para acessar em outros dispositivos na rede, utilize `http://<seu-ip-local>:8000`.
 
 ---
 
@@ -71,7 +72,7 @@ rizoma/
 
 ---
 
-## 🌿 Funcionalidades — v1.0.0
+## 🌿 Funcionalidades — v1.0.1
 
 ### ⚡ Geração de Conteúdo
 - **Pós-produção**: insira o tema de um vídeo já gravado → receba todos os assets prontos
@@ -114,6 +115,9 @@ O Rizoma é 100% local. Seus dados ficam no arquivo `data/rizoma.db` na sua máq
 ---
 
 ## 📝 Changelog
+
+### v1.0.1 (2026-07-28)
+- Servidor agora acessível via rede local (`host="0.0.0.0"`)
 
 ### v1.0.0 (2025-07-27)
 - MVP completo com interface web dark premium
