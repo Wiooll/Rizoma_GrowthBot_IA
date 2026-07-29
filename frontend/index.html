@@ -22,34 +22,60 @@
     </div>
   </div>
 
-  <div class="channel-wrapper">
-    <div class="channel-label">Canal Ativo</div>
-    <div class="channel-row">
-      <select id="channelSelect" class="channel-select">
-        <option value="">— Selecione —</option>
-      </select>
-      <button class="btn-icon-round" id="editChannelBtn" onclick="openEditChannel()" title="Editar canal" style="display:none">✏️</button>
+  <div class="sidebar-scroll">
+    <div class="nav-section">
+      <div class="nav-section-title">VISÃO GERAL</div>
+      <a class="nav-item" data-page="dashboard" onclick="showPage('dashboard')">
+        <span class="nav-icon">🏠</span><span>Dashboard</span>
+      </a>
+      <!-- Mantendo os atalhos antigos por segurança -->
+      <a class="nav-item" data-page="historico" onclick="showPage('historico')" style="display:none">
+        <span class="nav-icon">📚</span><span>Histórico</span>
+      </a>
+      <a class="nav-item" data-page="ideias" onclick="showPage('ideias')" style="display:none">
+        <span class="nav-icon">💡</span><span>Ideias</span>
+      </a>
     </div>
-    <button class="btn-new-channel" onclick="openModal('channelModal', 'create')">+ Novo Canal</button>
+
+    <div class="nav-section">
+      <div class="nav-section-title">MEUS CANAIS</div>
+      <a class="nav-item active" data-page="canais" onclick="showPage('canais')">
+        <span class="nav-icon">📺</span><span>Gestão de Canais</span>
+      </a>
+      <div id="sidebarChannelsList" class="sidebar-channels">
+        <!-- Lista de canais populada via JS -->
+      </div>
+      <a class="nav-item nav-item-add" onclick="openModal('channelModal', 'create')">
+        <span class="nav-icon">+</span><span>Novo Canal</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">BIBLIOTECA</div>
+      <a class="nav-item placeholder-link">
+        <span class="nav-icon">✨</span><span>Biblioteca de Skills</span>
+      </a>
+      <a class="nav-item placeholder-link">
+        <span class="nav-icon">❤️</span><span>Referências</span>
+      </a>
+      <a class="nav-item placeholder-link">
+        <span class="nav-icon">🖼️</span><span>Vídeos e Imagens</span>
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">FERRAMENTAS</div>
+      <a class="nav-item placeholder-link">
+        <span class="nav-icon">🎙️</span><span>Text to Speech</span>
+      </a>
+      <a class="nav-item" data-page="config" onclick="showPage('config')">
+        <span class="nav-icon">⚙️</span><span>Configurações</span>
+      </a>
+    </div>
   </div>
 
-  <nav class="sidebar-nav">
-    <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
-      <span class="nav-icon">🏠</span><span>Dashboard</span>
-    </a>
-    <a class="nav-item" data-page="historico" onclick="showPage('historico')">
-      <span class="nav-icon">📚</span><span>Histórico</span>
-    </a>
-    <a class="nav-item" data-page="ideias" onclick="showPage('ideias')">
-      <span class="nav-icon">💡</span><span>Ideias</span>
-    </a>
-    <a class="nav-item" data-page="config" onclick="showPage('config')">
-      <span class="nav-icon">⚙️</span><span>Configurações</span>
-    </a>
-  </nav>
-
   <div class="sidebar-footer">
-    <div class="version-badge">v1.0.0</div>
+    <button class="btn-upgrade">⚡ Fazer upgrade</button>
   </div>
 </aside>
 
@@ -160,6 +186,19 @@
     </div>
 
   </div><!-- /page-dashboard -->
+
+  <!-- ░░░ GESTÃO DE CANAIS ░░░ -->
+  <div id="page-canais" class="page">
+    <div class="page-header">
+      <div>
+        <h1>📺 Gestão de Canais</h1>
+        <p class="page-subtitle">Acompanhe as métricas e o status de produção dos seus canais</p>
+      </div>
+    </div>
+    <div id="gestaoCanaisGrid" class="channels-grid">
+      <!-- Cards serão injetados aqui -->
+    </div>
+  </div>
 
   <!-- ░░░ HISTÓRICO ░░░ -->
   <div id="page-historico" class="page">
@@ -273,6 +312,24 @@
         </div>
       </div>
 
+      <!-- YouTube section -->
+      <div id="youtubeSection" class="provider-section">
+        <h4 style="margin-top:20px;margin-bottom:12px;color:var(--text-primary);font-size:14px">📺 Integração com YouTube API</h4>
+        <div class="config-grid">
+          <div class="form-group">
+            <label class="form-label">
+              Chave de API do YouTube (Data API v3)
+              <a href="https://console.cloud.google.com/" target="_blank" class="link-get-key">Obter chave →</a>
+            </label>
+            <input type="password" id="cfgYoutubeKey" class="form-control" placeholder="AIza..." autocomplete="off" />
+            <small class="form-hint" id="youtubeKeyStatus"></small>
+          </div>
+        </div>
+        <div class="info-box">
+          ℹ️ Com a chave do YouTube, o Rizoma puxa os inscritos e visualizações reais na sua Gestão de Canais. Gratuito até 10.000 requisições/dia.
+        </div>
+      </div>
+
       <button class="btn-save-config" onclick="saveConfig()">💾 Salvar Configurações</button>
     </div>
 
@@ -338,6 +395,10 @@
       <div class="form-group">
         <label class="form-label">Público-alvo <span class="required">*</span></label>
         <input type="text" id="channelPublico" class="form-control" placeholder="Ex: Jovens de 18-30 que gostam de games e tecnologia..." />
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL do Canal no YouTube (Opcional)</label>
+        <input type="text" id="channelYoutubeUrl" class="form-control" placeholder="Ex: https://youtube.com/@MrBeast" />
       </div>
       <div class="form-group">
         <label class="form-label">Plataformas ativas</label>

@@ -17,6 +17,7 @@ from .database import (
     salvar_ideia, listar_ideias, atualizar_status_ideia, deletar_ideia,
 )
 from .llm import generate_content, load_config, save_config
+from .youtube import fetch_channel_stats
 
 # ─── App ──────────────────────────────────────────────────────────────────────
 
@@ -47,6 +48,7 @@ class CanalPayload(BaseModel):
     tom: str
     publico: str
     plataformas: List[str] = []
+    youtube_url: Optional[str] = ""
 
 
 @app.get("/api/canais")
@@ -56,7 +58,7 @@ async def get_canais():
 
 @app.post("/api/canais", status_code=201)
 async def post_canal(data: CanalPayload):
-    canal_id = criar_canal(data.nome, data.nicho, data.tom, data.publico, data.plataformas)
+    canal_id = criar_canal(data.nome, data.nicho, data.tom, data.publico, data.plataformas, data.youtube_url)
     return {"id": canal_id}
 
 
@@ -64,7 +66,7 @@ async def post_canal(data: CanalPayload):
 async def put_canal(canal_id: int, data: CanalPayload):
     if not obter_canal(canal_id):
         raise HTTPException(404, "Canal não encontrado")
-    atualizar_canal(canal_id, data.nome, data.nicho, data.tom, data.publico, data.plataformas)
+    atualizar_canal(canal_id, data.nome, data.nicho, data.tom, data.publico, data.plataformas, data.youtube_url)
     return {"ok": True}
 
 
@@ -171,6 +173,7 @@ async def get_config():
         "ollama_model": llm.get("ollama_model", "llama3"),
         "gemini_api_key_set": bool(llm.get("gemini_api_key", "")),
         "openai_api_key_set": bool(llm.get("openai_api_key", "")),
+        "youtube_api_key_set": bool(llm.get("youtube_api_key", "")),
     }
     return safe
 
@@ -183,6 +186,7 @@ class ConfigPayload(BaseModel):
     openai_api_key: Optional[str] = ""
     ollama_url: Optional[str] = "http://localhost:11434"
     ollama_model: Optional[str] = "llama3"
+    youtube_api_key: Optional[str] = ""
 
 
 @app.put("/api/config")
@@ -201,10 +205,37 @@ async def put_config(data: ConfigPayload):
         llm["gemini_api_key"] = data.gemini_api_key
     if data.openai_api_key and not data.openai_api_key.startswith("***"):
         llm["openai_api_key"] = data.openai_api_key
+    if data.youtube_api_key and not data.youtube_api_key.startswith("***"):
+        llm["youtube_api_key"] = data.youtube_api_key
 
     config["llm"] = llm
     save_config(config)
     return {"ok": True}
+
+
+# ─── YouTube ──────────────────────────────────────────────────────────────────
+
+@app.get("/api/youtube/stats/{canal_id}")
+async def get_youtube_stats(canal_id: int):
+    canal = obter_canal(canal_id)
+    if not canal:
+        raise HTTPException(404, "Canal não encontrado")
+
+    youtube_url = canal.get("youtube_url")
+    if not youtube_url:
+        return {"subscriberCount": "0", "viewCount": "0", "videoCount": "0"}
+
+    config = load_config()
+    api_key = config.get("llm", {}).get("youtube_api_key", "")
+    
+    stats = await fetch_channel_stats(youtube_url, api_key)
+    
+    if "error" in stats:
+        # Se houver erro, retornamos zero para não quebrar a UI,
+        # ou a UI pode tratar o erro dependendo do design.
+        return {"subscriberCount": "0", "viewCount": "0", "videoCount": "0", "_error": stats["error"]}
+
+    return stats
 
 
 # ─── Tendências (Phase 2 placeholder) ────────────────────────────────────────

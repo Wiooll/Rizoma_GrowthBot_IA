@@ -24,6 +24,7 @@ def init_db():
                 tom         TEXT    NOT NULL,
                 publico     TEXT    NOT NULL,
                 plataformas TEXT    NOT NULL DEFAULT '[]',
+                youtube_url TEXT    DEFAULT '',
                 criado_em   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
@@ -47,6 +48,10 @@ def init_db():
                 FOREIGN KEY (canal_id) REFERENCES canais(id) ON DELETE CASCADE
             );
         """)
+        try:
+            conn.execute("ALTER TABLE canais ADD COLUMN youtube_url TEXT DEFAULT ''")
+        except sqlite3.OperationalError:
+            pass  # Coluna já existe
 
 
 @contextmanager
@@ -68,11 +73,11 @@ def get_db():
 
 # ─── Canais ───────────────────────────────────────────────────────────────────
 
-def criar_canal(nome: str, nicho: str, tom: str, publico: str, plataformas: list) -> int:
+def criar_canal(nome: str, nicho: str, tom: str, publico: str, plataformas: list, youtube_url: str = "") -> int:
     with get_db() as conn:
         cur = conn.execute(
-            "INSERT INTO canais (nome, nicho, tom, publico, plataformas) VALUES (?,?,?,?,?)",
-            (nome, nicho, tom, publico, json.dumps(plataformas)),
+            "INSERT INTO canais (nome, nicho, tom, publico, plataformas, youtube_url) VALUES (?,?,?,?,?,?)",
+            (nome, nicho, tom, publico, json.dumps(plataformas), youtube_url),
         )
         return cur.lastrowid
 
@@ -103,11 +108,11 @@ def obter_canal(canal_id: int) -> Optional[dict]:
 
 
 def atualizar_canal(canal_id: int, nome: str, nicho: str, tom: str,
-                    publico: str, plataformas: list):
+                    publico: str, plataformas: list, youtube_url: str = ""):
     with get_db() as conn:
         conn.execute(
-            "UPDATE canais SET nome=?,nicho=?,tom=?,publico=?,plataformas=? WHERE id=?",
-            (nome, nicho, tom, publico, json.dumps(plataformas), canal_id),
+            "UPDATE canais SET nome=?,nicho=?,tom=?,publico=?,plataformas=?,youtube_url=? WHERE id=?",
+            (nome, nicho, tom, publico, json.dumps(plataformas), youtube_url, canal_id),
         )
 
 
