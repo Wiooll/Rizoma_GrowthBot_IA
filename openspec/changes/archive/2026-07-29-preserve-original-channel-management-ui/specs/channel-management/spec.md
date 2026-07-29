@@ -1,3 +1,5 @@
+## MODIFIED Requirements
+
 ### Requirement: Manage Channels
 The system SHALL allow users to create, read, update, and delete Channel profiles, including an optional YouTube channel URL, while keeping channel selection available through the original sidebar selector.
 

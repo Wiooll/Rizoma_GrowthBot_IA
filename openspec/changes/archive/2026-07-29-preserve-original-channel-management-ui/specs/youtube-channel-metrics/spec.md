@@ -1,0 +1,23 @@
+## ADDED Requirements
+
+### Requirement: Fetch YouTube Channel Metrics
+The system SHALL fetch basic public YouTube channel metrics for a saved channel URL using the configured YouTube Data API v3 key.
+
+#### Scenario: Channel has YouTube URL and API key
+- **WHEN** user opens Gestão de Canais for a channel with a YouTube URL and configured API key
+- **THEN** system requests subscriber count, view count, and video count from the YouTube Data API v3.
+
+#### Scenario: Channel has no YouTube URL
+- **WHEN** user opens Gestão de Canais for a channel without a YouTube URL
+- **THEN** system displays neutral metric values without making a YouTube API request.
+
+#### Scenario: YouTube API returns an error
+- **WHEN** the YouTube API key is missing, invalid, rate-limited, or the channel cannot be resolved
+- **THEN** system returns a controlled error response and the interface remains usable.
+
+### Requirement: Cache YouTube Channel Metrics
+The system SHALL cache YouTube metric responses temporarily to reduce repeated external API calls.
+
+#### Scenario: Metrics are requested repeatedly
+- **WHEN** the same channel metrics are requested again before the cache expires
+- **THEN** system returns cached metrics instead of making another YouTube API request.
