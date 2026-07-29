@@ -46,6 +46,8 @@ O Rizoma suporta 3 provedores de IA. Acesse **⚙️ Configurações** no app:
 
 > Sem configurar uma API key, o app roda em **modo demo** — você vê a interface funcionando mas sem geração real.
 
+Para métricas de canais, configure também a chave da **YouTube Data API v3** em **⚙️ Configurações** e informe a URL do canal no cadastro.
+
 ---
 
 ## 📁 Estrutura do Projeto
@@ -59,7 +61,8 @@ rizoma/
 ├── backend/
 │   ├── main.py            # FastAPI — rotas da API REST
 │   ├── database.py        # SQLite — canais, conteúdos, ideias
-│   └── llm.py             # Adaptador LLM + builder de prompts
+│   ├── llm.py             # Adaptador LLM + builder de prompts
+│   └── youtube.py         # Integração com YouTube Data API v3
 │
 ├── frontend/
 │   ├── index.html         # SPA principal
@@ -72,7 +75,7 @@ rizoma/
 
 ---
 
-## 🌿 Funcionalidades — v1.0.1
+## 🌿 Funcionalidades — v1.0.2
 
 ### ⚡ Geração de Conteúdo
 - **Pós-produção**: insira o tema de um vídeo já gravado → receba todos os assets prontos
@@ -82,6 +85,7 @@ rizoma/
 ### 📺 Múltiplos Canais
 - Crie perfis separados por nicho (Games, Tech, Reflexões...)
 - Cada canal tem tom de voz, público-alvo e plataformas independentes
+- A tela **Gestão de Canais** acompanha inscritos, views e vídeos via YouTube Data API v3
 - O bot adapta o conteúdo automaticamente ao perfil do canal
 
 ### 💡 Ideias e Tendências
@@ -115,6 +119,11 @@ O Rizoma é 100% local. Seus dados ficam no arquivo `data/rizoma.db` na sua máq
 ---
 
 ## 📝 Changelog
+
+### v1.0.2 (2026-07-29)
+- Adiciona tela **Gestão de Canais** mantendo o visual original do projeto
+- Adiciona integração com YouTube Data API v3 para métricas de canais
+- Permite salvar URL do canal e chave da API do YouTube nas configurações
 
 ### v1.0.1 (2026-07-28)
 - Servidor agora acessível via rede local (`host="0.0.0.0"`)

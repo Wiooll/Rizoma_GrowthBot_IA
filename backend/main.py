@@ -21,7 +21,7 @@ from .youtube import fetch_channel_stats
 
 # ─── App ──────────────────────────────────────────────────────────────────────
 
-app = FastAPI(title="Rizoma", version="1.0.0", docs_url=None, redoc_url=None)
+app = FastAPI(title="Rizoma", version="1.0.2", docs_url=None, redoc_url=None)
 
 FRONTEND_PATH = Path("frontend")
 

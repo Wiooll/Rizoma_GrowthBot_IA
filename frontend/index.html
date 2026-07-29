@@ -22,60 +22,37 @@
     </div>
   </div>
 
-  <div class="sidebar-scroll">
-    <div class="nav-section">
-      <div class="nav-section-title">VISÃO GERAL</div>
-      <a class="nav-item" data-page="dashboard" onclick="showPage('dashboard')">
-        <span class="nav-icon">🏠</span><span>Dashboard</span>
-      </a>
-      <!-- Mantendo os atalhos antigos por segurança -->
-      <a class="nav-item" data-page="historico" onclick="showPage('historico')" style="display:none">
-        <span class="nav-icon">📚</span><span>Histórico</span>
-      </a>
-      <a class="nav-item" data-page="ideias" onclick="showPage('ideias')" style="display:none">
-        <span class="nav-icon">💡</span><span>Ideias</span>
-      </a>
+  <div class="channel-wrapper">
+    <div class="channel-label">Canal Ativo</div>
+    <div class="channel-row">
+      <select id="channelSelect" class="channel-select">
+        <option value="">— Selecione —</option>
+      </select>
+      <button class="btn-icon-round" id="editChannelBtn" onclick="openEditChannel()" title="Editar canal" style="display:none">✏️</button>
     </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">MEUS CANAIS</div>
-      <a class="nav-item active" data-page="canais" onclick="showPage('canais')">
-        <span class="nav-icon">📺</span><span>Gestão de Canais</span>
-      </a>
-      <div id="sidebarChannelsList" class="sidebar-channels">
-        <!-- Lista de canais populada via JS -->
-      </div>
-      <a class="nav-item nav-item-add" onclick="openModal('channelModal', 'create')">
-        <span class="nav-icon">+</span><span>Novo Canal</span>
-      </a>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">BIBLIOTECA</div>
-      <a class="nav-item placeholder-link">
-        <span class="nav-icon">✨</span><span>Biblioteca de Skills</span>
-      </a>
-      <a class="nav-item placeholder-link">
-        <span class="nav-icon">❤️</span><span>Referências</span>
-      </a>
-      <a class="nav-item placeholder-link">
-        <span class="nav-icon">🖼️</span><span>Vídeos e Imagens</span>
-      </a>
-    </div>
-
-    <div class="nav-section">
-      <div class="nav-section-title">FERRAMENTAS</div>
-      <a class="nav-item placeholder-link">
-        <span class="nav-icon">🎙️</span><span>Text to Speech</span>
-      </a>
-      <a class="nav-item" data-page="config" onclick="showPage('config')">
-        <span class="nav-icon">⚙️</span><span>Configurações</span>
-      </a>
-    </div>
+    <button class="btn-new-channel" onclick="openModal('channelModal', 'create')">+ Novo Canal</button>
   </div>
 
+  <nav class="sidebar-nav">
+    <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
+      <span class="nav-icon">🏠</span><span>Dashboard</span>
+    </a>
+    <a class="nav-item" data-page="canais" onclick="showPage('canais')">
+      <span class="nav-icon">📺</span><span>Gestão de Canais</span>
+    </a>
+    <a class="nav-item" data-page="historico" onclick="showPage('historico')">
+      <span class="nav-icon">📚</span><span>Histórico</span>
+    </a>
+    <a class="nav-item" data-page="ideias" onclick="showPage('ideias')">
+      <span class="nav-icon">💡</span><span>Ideias</span>
+    </a>
+    <a class="nav-item" data-page="config" onclick="showPage('config')">
+      <span class="nav-icon">⚙️</span><span>Configurações</span>
+    </a>
+  </nav>
+
   <div class="sidebar-footer">
-    <button class="btn-upgrade">⚡ Fazer upgrade</button>
+    <div class="version-badge">v1.0.2</div>
   </div>
 </aside>
 

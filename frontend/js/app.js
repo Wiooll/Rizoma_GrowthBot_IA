@@ -77,69 +77,76 @@ function showPage(page) {
 async function loadChannels() {
   try {
     state.channels = await api.get('/api/canais');
-    renderSidebarChannels();
-    
-    if (document.getElementById('page-canais')?.classList.contains('active')) {
-      renderGestaoCanais();
-    }
-    
+    renderChannelSelect();
+
     const saved = localStorage.getItem('rizoma_canal');
-    if (saved && state.channels.some(c => c.id === parseInt(saved))) {
-      onChannelChange(parseInt(saved));
-    } else if (state.channels.length > 0) {
-      onChannelChange(state.channels[0].id);
-    } else {
-      onChannelChange(null);
+    if (saved) {
+      const el = document.getElementById('channelSelect');
+      if ([...el.options].some(o => o.value === saved)) {
+        el.value = saved;
+        onChannelChange();
+        if (document.getElementById('page-canais')?.classList.contains('active')) renderGestaoCanais();
+        return;
+      }
     }
+
+    if (state.channels.length > 0) {
+      document.getElementById('channelSelect').value = String(state.channels[0].id);
+      onChannelChange();
+    } else {
+      onChannelChange();
+    }
+
+    if (document.getElementById('page-canais')?.classList.contains('active')) renderGestaoCanais();
   } catch (e) {
     console.error(e);
   }
 }
 
-function renderSidebarChannels() {
-  const list = document.getElementById('sidebarChannelsList');
-  if (!list) return;
-  list.innerHTML = '';
+function renderChannelSelect() {
+  const sel = document.getElementById('channelSelect');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— Selecione um canal —</option>';
   state.channels.forEach(c => {
-    const el = document.createElement('a');
-    el.className = 'sidebar-channel-item';
-    if (state.currentChannel && state.currentChannel.id === c.id) {
-      el.classList.add('active');
-    }
-    el.innerHTML = `
-      <span class="sidebar-channel-icon">${c.plataformas.includes('YouTube') ? '▶' : '•'}</span>
-      <span>${escapeHtml(c.nome)}</span>
-    `;
-    el.onclick = () => {
-      onChannelChange(c.id);
-      showPage('dashboard');
-    };
-    list.appendChild(el);
+    const opt = document.createElement('option');
+    opt.value = String(c.id);
+    opt.textContent = `${c.nome}`;
+    sel.appendChild(opt);
   });
+  if (cur) sel.value = cur;
 }
 
-function onChannelChange(id) {
+function onChannelChange() {
+  const sel = document.getElementById('channelSelect');
+  const id = parseInt(sel.value);
   if (!id) {
     state.currentChannel = null;
+    document.getElementById('editChannelBtn').style.display = 'none';
     document.getElementById('dashTitle').textContent = 'Dashboard';
     document.getElementById('dashSubtitle').textContent = 'Selecione um canal para começar';
     document.getElementById('trendsList').innerHTML = '<div class="empty-msg">Selecione um canal</div>';
     document.getElementById('ideiasDash').innerHTML = '<div class="empty-msg">Selecione um canal</div>';
     document.getElementById('recentList').innerHTML = '<div class="empty-msg">Nenhum conteúdo ainda</div>';
-    renderSidebarChannels();
+    if (document.getElementById('page-canais')?.classList.contains('active')) renderGestaoCanais();
     return;
   }
   state.currentChannel = state.channels.find(c => c.id === id);
   localStorage.setItem('rizoma_canal', String(id));
-  
-  document.getElementById('dashTitle').innerHTML = `${escapeHtml(state.currentChannel.nome)} <button class="btn-edit-small" onclick="openEditChannel()" title="Editar canal">✏️</button>`;
+  document.getElementById('editChannelBtn').style.display = 'flex';
+  document.getElementById('dashTitle').textContent = state.currentChannel.nome;
   document.getElementById('dashSubtitle').textContent =
     `Nicho: ${state.currentChannel.nicho} · ${state.currentChannel.plataformas.length} plataformas`;
-    
-  renderSidebarChannels();
   loadTrends();
   loadIdeiasDash();
   loadRecentList();
+  if (document.getElementById('page-canais')?.classList.contains('active')) renderGestaoCanais();
+}
+
+function selectChannelAndShow(canalId, page) {
+  const sel = document.getElementById('channelSelect');
+  sel.value = String(canalId);
+  onChannelChange();
+  showPage(page);
 }
 
 // ─── Modal Canal ──────────────────────────────────────────────────────────────
@@ -212,6 +219,7 @@ async function saveChannel() {
       showToast('Canal atualizado! 🌿');
     } else {
       const res = await api.post('/api/canais', { nome, nicho, tom, publico, plataformas, youtube_url });
+      document.getElementById('channelSelect').value = String(res.id);
       localStorage.setItem('rizoma_canal', String(res.id));
       showToast('Canal criado! 🌿');
     }
@@ -227,63 +235,57 @@ function renderGestaoCanais() {
   const grid = document.getElementById('gestaoCanaisGrid');
   if (!grid) return;
   grid.innerHTML = '';
-  
+
   if (state.channels.length === 0) {
     grid.innerHTML = '<div class="empty-msg centered">Você ainda não tem nenhum canal cadastrado.</div>';
     return;
   }
-  
+
   state.channels.forEach(c => {
     const cardId = `ccard_${c.id}`;
-    const ytUrl = c.youtube_url || '';
-    const flag = '🇧🇷';
-    const avatarTxt = c.nome.substring(0, 2).toUpperCase();
-    
+    const youtubeUrl = c.youtube_url || '';
+    const activeClass = state.currentChannel?.id === c.id ? ' active' : '';
+
     const html = `
-      <div class="channel-card-new" id="${cardId}">
-        <div class="cc-header">
-          <div class="cc-avatar">
-            ${avatarTxt}
-            <div class="cc-avatar-flag">${flag}</div>
+      <div class="card channel-card${activeClass}" id="${cardId}">
+        <div class="card-header channel-card-header">
+          <div>
+            <h2 class="card-title">${escapeHtml(c.nome)}</h2>
+            <p class="channel-card-subtitle">${escapeHtml(c.nicho)}</p>
           </div>
-          <div class="cc-info">
-            <div class="cc-name">${escapeHtml(c.nome)}</div>
-            <div class="cc-nicho">${escapeHtml(c.nicho)}</div>
+          <span class="recent-modo pos">Ativo</span>
+        </div>
+
+        <div class="channel-stats">
+          <div class="channel-stat">
+            <strong id="${cardId}_subs">--</strong>
+            <span>Inscritos</span>
           </div>
-          <div class="cc-status">
-            <div class="cc-status-dot"></div> Ativo
+          <div class="channel-stat">
+            <strong id="${cardId}_views">--</strong>
+            <span>Views</span>
+          </div>
+          <div class="channel-stat">
+            <strong id="${cardId}_vids">--</strong>
+            <span>Vídeos</span>
           </div>
         </div>
-        
-        <div class="cc-stats">
-          <div class="cc-stat-col">
-            <div class="cc-stat-val" id="${cardId}_subs">--</div>
-            <div class="cc-stat-label">Inscritos</div>
-          </div>
-          <div class="cc-stat-col">
-            <div class="cc-stat-val" id="${cardId}_views">--</div>
-            <div class="cc-stat-label">Views</div>
-          </div>
-          <div class="cc-stat-col">
-            <div class="cc-stat-val" id="${cardId}_vids">--</div>
-            <div class="cc-stat-label">Videos</div>
-          </div>
+
+        <div class="channel-card-meta">
+          <span>${c.plataformas.length} plataformas ativas</span>
+          <span>${youtubeUrl ? 'YouTube conectado' : 'YouTube não configurado'}</span>
         </div>
-        
-        <div class="cc-production">
-          <button class="cc-prod-btn" onclick="onChannelChange(${c.id});showPage('dashboard')">▶ Produzir</button>
-          <button class="cc-prod-btn done" onclick="onChannelChange(${c.id});showPage('historico')">✓ Histórico</button>
-        </div>
-        
-        <div class="cc-footer">
-          <div class="cc-footer-item">🎬 ${c.plataformas.length} plataformas ativas</div>
-          <button class="btn-edit-small" onclick="onChannelChange(${c.id});openEditChannel()">✏️ Editar</button>
+
+        <div class="channel-card-actions">
+          <button class="btn-secondary-sm" onclick="selectChannelAndShow(${c.id}, 'dashboard')">Produzir</button>
+          <button class="btn-secondary-sm" onclick="selectChannelAndShow(${c.id}, 'historico')">Histórico</button>
+          <button class="btn-primary-sm" onclick="selectChannelAndShow(${c.id}, 'dashboard');openEditChannel()">Editar</button>
         </div>
       </div>
     `;
     grid.insertAdjacentHTML('beforeend', html);
-    
-    if (ytUrl) {
+
+    if (youtubeUrl) {
       fetchYoutubeStats(c.id, cardId);
     } else {
       document.getElementById(`${cardId}_subs`).textContent = 'N/A';
@@ -302,14 +304,14 @@ async function fetchYoutubeStats(canalId, cardId) {
       document.getElementById(`${cardId}_vids`).textContent = 'Erro';
       return;
     }
-    
+
     const fmt = (n) => {
       const num = parseInt(n) || 0;
-      if (num >= 1000000) return (num/1000000).toFixed(1) + 'M';
-      if (num >= 1000) return (num/1000).toFixed(1) + 'K';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
       return num.toString();
     };
-    
+
     document.getElementById(`${cardId}_subs`).textContent = fmt(data.subscriberCount);
     document.getElementById(`${cardId}_views`).textContent = fmt(data.viewCount);
     document.getElementById(`${cardId}_vids`).textContent = fmt(data.videoCount);
