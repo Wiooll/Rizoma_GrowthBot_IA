@@ -5,13 +5,14 @@ Um conteúdo. Todas as direções.
 Entry point: python rizoma.py
 """
 
-import uvicorn
-import webbrowser
-import threading
-import time
 import os
 import sys
+import threading
+import time
+import webbrowser
 from pathlib import Path
+
+import uvicorn
 
 # Garante que o diretório raiz está no path
 ROOT = Path(__file__).parent
@@ -33,7 +34,7 @@ def print_banner():
 
     banner = """
   ==========================================
-         R I Z O M A  -  v1.0.1
+         R I Z O M A  -  v1.0.3
       Um conteudo. Todas as direcoes.
   ==========================================
 
@@ -44,14 +45,20 @@ def print_banner():
     print(banner)
 
 
+def should_open_browser():
+    """Evita abrir navegador automaticamente em ambientes sem interface."""
+    return os.getenv("RIZOMA_OPEN_BROWSER", "1").strip().lower() not in {"0", "false", "no"}
+
+
 if __name__ == "__main__":
     print_banner()
 
     # Cria diretório de dados se não existir
     (ROOT / "data").mkdir(exist_ok=True)
 
-    # Abre navegador em background
-    threading.Thread(target=open_browser, daemon=True).start()
+    # Abre navegador apenas quando explicitamente permitido
+    if should_open_browser():
+        threading.Thread(target=open_browser, daemon=True).start()
 
     # Inicia servidor FastAPI
     uvicorn.run(
@@ -61,3 +68,4 @@ if __name__ == "__main__":
         reload=False,
         log_level="warning",
     )
+

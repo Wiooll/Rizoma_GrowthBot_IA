@@ -75,7 +75,7 @@ rizoma/
 
 ---
 
-## 🌿 Funcionalidades — v1.0.2
+## 🌿 Funcionalidades — v1.0.3
 
 ### ⚡ Geração de Conteúdo
 - **Pós-produção**: insira o tema de um vídeo já gravado → receba todos os assets prontos
@@ -119,6 +119,11 @@ O Rizoma é 100% local. Seus dados ficam no arquivo `data/rizoma.db` na sua máq
 ---
 
 ## 📝 Changelog
+
+### v1.0.3 (2026-07-30)
+- Adiciona Dockerfile para empacotar a aplicação com Python 3.11
+- Adiciona docker-compose.yml para subir o projeto com persistência de dados e configuração
+- Evita abrir navegador automaticamente quando o app roda dentro de container
 
 ### v1.0.2 (2026-07-29)
 - Adiciona tela **Gestão de Canais** mantendo o visual original do projeto

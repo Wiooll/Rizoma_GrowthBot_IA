@@ -21,7 +21,7 @@ from .youtube import fetch_channel_stats
 
 # ─── App ──────────────────────────────────────────────────────────────────────
 
-app = FastAPI(title="Rizoma", version="1.0.2", docs_url=None, redoc_url=None)
+app = FastAPI(title="Rizoma", version="1.0.3", docs_url=None, redoc_url=None)
 
 FRONTEND_PATH = Path("frontend")
 
@@ -288,3 +288,4 @@ async def get_trends(canal_id: int):
         "fase": 2,
         "nota": "Integração com Google Trends e Reddit disponível na Fase 2",
     }
+

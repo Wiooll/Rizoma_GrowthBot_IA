@@ -1,0 +1,16 @@
+.git
+.gitignore
+.agent
+.agents
+.claude
+.codex
+.gemini
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+venv
+.venv
+node_modules
+openspec
