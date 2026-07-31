@@ -6,6 +6,6 @@ httpx>=0.26.0
 python-multipart>=0.0.6
 
 # LLM Providers (instale o que for usar)
-google-generativeai>=0.4.0   # Google Gemini (recomendado, gratuito)
+google-genai>=0.2.0   # Google Gemini (recomendado, gratuito)
 openai>=1.0.0                 # OpenAI GPT (opcional)
 # ollama não precisa de pacote — usa httpx direto

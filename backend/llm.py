@@ -149,28 +149,37 @@ Retorne EXATAMENTE neste formato JSON:
 # ─── Providers ────────────────────────────────────────────────────────────────
 
 async def _call_gemini(prompt: str, api_key: str, model: str) -> dict:
+    import asyncio
     try:
         from google import genai
         from google.genai import types as genai_types
-
-        client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model=model,
-            contents=prompt,
-            config=genai_types.GenerateContentConfig(
-                response_mime_type="application/json",
-            ),
-        )
-        text = response.text
-        return json.loads(text)
     except ImportError:
         raise ValueError(
             "Pacote nao instalado. Execute: pip install google-genai"
         )
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Gemini retornou JSON invalido: {e}")
-    except Exception as e:
-        raise ValueError(f"Erro Gemini: {e}")
+
+    client = genai.Client(api_key=api_key)
+    max_retries = 3
+    
+    for attempt in range(max_retries):
+        try:
+            response = await client.aio.models.generate_content(
+                model=model,
+                contents=prompt,
+                config=genai_types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
+            )
+            return json.loads(response.text)
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Gemini retornou JSON invalido: {e}")
+        except Exception as e:
+            error_msg = str(e)
+            if "503" in error_msg or "429" in error_msg:
+                if attempt < max_retries - 1:
+                    await asyncio.sleep(2 ** attempt)  # Backoff: 1s, 2s
+                    continue
+            raise ValueError(f"Erro Gemini: {e}")
 
 
 
