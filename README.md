@@ -75,7 +75,7 @@ rizoma/
 
 ---
 
-## 🌿 Funcionalidades — v1.0.3
+## 🌿 Funcionalidades — v1.0.5
 
 ### ⚡ Geração de Conteúdo
 - **Pós-produção**: insira o tema de um vídeo já gravado → receba todos os assets prontos
@@ -119,6 +119,13 @@ O Rizoma é 100% local. Seus dados ficam no arquivo `data/rizoma.db` na sua máq
 ---
 
 ## 📝 Changelog
+
+### v1.0.5 (2026-07-31)
+- Implementa mecanismo de retry com backoff exponencial para lidar com picos de tráfego e erros 503 da API do Google Gemini.
+- Otimiza as requisições ao Gemini, passando a utilizar as chamadas assíncronas nativas do novo SDK (`client.aio.models`).
+
+### v1.0.4 (2026-07-31)
+- Corrige erro de requisição ao atualizar a dependência do SDK do Google Gemini para o novo `google-genai` e refletir em requirements.txt.
 
 ### v1.0.3 (2026-07-30)
 - Adiciona Dockerfile para empacotar a aplicação com Python 3.11
