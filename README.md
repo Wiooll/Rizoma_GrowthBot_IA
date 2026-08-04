@@ -34,6 +34,43 @@ Para acessar em outros dispositivos na rede, utilize `http://<seu-ip-local>:8000
 
 ---
 
+## 📱 Versão móvel privada
+
+A versão **v1.1.0** pode ser instalada como PWA no iPhone e usada com o computador desligado. A interface permanece hospedada, mas canais, ideias, histórico e preferências ficam somente no armazenamento local do aparelho.
+
+### Instalar no iPhone
+
+1. Abra o endereço privado publicado usando o Chrome no iPhone.
+2. Entre com a conta autorizada do proprietário.
+3. No menu de compartilhamento, escolha **Adicionar à Tela de Início**.
+4. Abra o ícone **Rizoma** criado na tela inicial.
+5. Acesse **Configurações → Dados neste iPhone** e importe o backup da migração.
+
+### Migrar os dados atuais
+
+No computador, gere um arquivo sem chaves de API:
+
+```bash
+python scripts/export_mobile_backup.py
+```
+
+O arquivo será criado em `data/rizoma-mobile-backup.json` e permanecerá ignorado pelo Git. Transfira-o ao aplicativo Arquivos do iPhone por um meio de sua confiança e selecione **Importar backup**. A importação valida o conteúdo antes de substituir o banco local.
+
+### Build e validação móvel
+
+```bash
+npm install
+npm test
+npm run spellcheck
+npm run build
+```
+
+As chaves `GEMINI_API_KEY`, `OPENAI_API_KEY` e `YOUTUBE_API_KEY` devem ser cadastradas somente como segredos da hospedagem. A versão móvel não salva essas chaves no navegador. O Ollama continua disponível apenas no modo local do computador.
+
+> Exporte backups regularmente. O iOS pode apagar os dados se o aplicativo for removido, se os dados do site forem limpos ou em situações de pressão de armazenamento.
+
+---
+
 ## ⚙️ Configurando a IA
 
 O Rizoma suporta 3 provedores de IA. Acesse **⚙️ Configurações** no app:
@@ -67,7 +104,13 @@ rizoma/
 ├── frontend/
 │   ├── index.html         # SPA principal
 │   ├── css/style.css      # Design system (dark + verde)
-│   └── js/app.js          # Lógica da interface
+│   └── js/                # Interface, IndexedDB e PWA
+│
+├── hosted/                # Proxy protegido compatível com Workers
+├── public/                # Manifesto, service worker, ícones e social card
+├── scripts/               # Build, migração e bloqueio ortográfico
+├── tests/                 # Testes do banco móvel, proxy e exportação
+├── package.json           # Build e validações da versão móvel
 │
 └── data/
     └── rizoma.db          # Banco SQLite (criado automaticamente)
@@ -75,7 +118,7 @@ rizoma/
 
 ---
 
-## 🌿 Funcionalidades — v1.0.5
+## 🌿 Funcionalidades — v1.1.0
 
 ### ⚡ Geração de Conteúdo
 - **Pós-produção**: insira o tema de um vídeo já gravado → receba todos os assets prontos
@@ -114,11 +157,18 @@ rizoma/
 
 ## 🔒 Privacidade
 
-O Rizoma é 100% local. Seus dados ficam no arquivo `data/rizoma.db` na sua máquina. Nenhuma informação é enviada a servidores externos, exceto as chamadas necessárias à API do LLM escolhido.
+No computador, os dados ficam em `data/rizoma.db`. Na PWA, canais, ideias, histórico e preferências ficam no IndexedDB do iPhone. O tema e o perfil do canal são enviados apenas durante a geração para o proxy protegido e para a API selecionada; o proxy não persiste esses dados. Chaves de API permanecem no ambiente protegido da hospedagem.
 
 ---
 
 ## 📝 Changelog
+
+### v1.1.0 (2026-08-04)
+- Adiciona PWA privada instalável no iPhone, mantendo o visual original.
+- Adiciona persistência local por IndexedDB, solicitação de armazenamento persistente e navegação móvel.
+- Adiciona backup JSON validado e migração completa do SQLite sem incluir chaves de API.
+- Adiciona proxy autenticado e sem estado para Gemini, OpenAI e métricas do YouTube.
+- Adiciona build compatível com hospedagem, testes automatizados e bloqueio contra erros ortográficos e corrupção UTF-8.
 
 ### v1.0.5 (2026-07-31)
 - Implementa mecanismo de retry com backoff exponencial para lidar com picos de tráfego e erros 503 da API do Google Gemini.

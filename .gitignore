@@ -42,3 +42,8 @@ test_gemini.py
 # macOS / Windows
 .DS_Store
 Thumbs.db
+
+# Build e ferramentas web
+node_modules/
+.wrangler/
+npm-debug.log*

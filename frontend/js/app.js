@@ -13,36 +13,34 @@ const state = {
   currentResults: null,
   currentTab: 'youtube',
 };
+const isHostedRuntime = document.documentElement.dataset.runtime === 'hosted';
 
 // ─── API ─────────────────────────────────────────────────────────────────────
 const api = {
+  async request(method, path, body) {
+    if (isHostedRuntime && window.RizomaMobile?.canHandle(path)) {
+      return window.RizomaMobile.request(method, path, body);
+    }
+    const res = await fetch(path, {
+      method,
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const payload = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(payload.detail || 'Erro na solicitação');
+    return payload;
+  },
   async get(path) {
-    const res = await fetch(path);
-    if (!res.ok) throw new Error((await res.json()).detail || 'Erro');
-    return res.json();
+    return this.request('GET', path);
   },
   async post(path, body) {
-    const res = await fetch(path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error((await res.json()).detail || 'Erro');
-    return res.json();
+    return this.request('POST', path, body);
   },
   async put(path, body) {
-    const res = await fetch(path, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error((await res.json()).detail || 'Erro');
-    return res.json();
+    return this.request('PUT', path, body);
   },
   async del(path) {
-    const res = await fetch(path, { method: 'DELETE' });
-    if (!res.ok) throw new Error((await res.json()).detail || 'Erro');
-    return res.json();
+    return this.request('DELETE', path);
   },
 };
 
@@ -524,14 +522,14 @@ function chipGroup(label, items, type = 'tag') {
   const cssClass = type === 'hashtag' ? 'hashtag-chip' : 'tag-chip';
   const id = `chips_${Math.random().toString(36).substr(2, 9)}`;
   const chips = items.map(t =>
-    `<span class="${cssClass}" onclick="copyText('${escapeAttr(t)}')">${escapeHtml(t)}</span>`
+    `<span class="${cssClass}" onclick="copyText(decodeURIComponent('${encodeInline(t)}'))">${escapeHtml(t)}</span>`
   ).join('');
   return `
     <div class="asset-group">
       <div class="asset-label">${label}</div>
       <div class="asset-box-row">
         <div class="tags-cloud" id="${id}">${chips}</div>
-        <button class="btn-copy" onclick="copyText('${escapeAttr(items.join(' '))}', this)">📋 Copiar todos</button>
+        <button class="btn-copy" onclick="copyText(decodeURIComponent('${encodeInline(items.join(' '))}'), this)">📋 Copiar todos</button>
       </div>
     </div>`;
 }
@@ -542,7 +540,7 @@ function threadGroup(items) {
     <div class="thread-item">
       <div class="thread-num">${i + 1}/${items.length}</div>
       <div class="thread-text">${escapeHtml(t)}</div>
-      <button class="btn-copy" onclick="copyText('${escapeAttr(t)}', this)">📋</button>
+      <button class="btn-copy" onclick="copyText(decodeURIComponent('${encodeInline(t)}'), this)">📋</button>
     </div>
   `).join('');
   return `
@@ -604,7 +602,7 @@ async function loadTrends() {
       return;
     }
     el.innerHTML = data.trends.map(t => `
-      <div class="trend-item" onclick="useTrend('${escapeAttr(t.tema)}')">
+      <div class="trend-item" onclick="useTrend(decodeURIComponent('${encodeInline(t.tema)}'))">
         <span class="trend-stars">${'★'.repeat(t.potencial)}${'☆'.repeat(5 - t.potencial)}</span>
         <span class="trend-text">${escapeHtml(t.tema)}</span>
         <span class="trend-use">Usar →</span>
@@ -632,7 +630,7 @@ async function loadIdeiasDash() {
       return;
     }
     el.innerHTML = ideias.map(i => `
-      <div class="idea-item-dash" onclick="useIdeia('${escapeAttr(i.tema)}')">
+      <div class="idea-item-dash" onclick="useIdeia(decodeURIComponent('${encodeInline(i.tema)}'))">
         <span class="idea-text-dash">${escapeHtml(i.tema)}</span>
         <span class="idea-stars-dash">${'★'.repeat(i.potencial)}</span>
       </div>
@@ -660,7 +658,7 @@ async function loadIdeiasPage() {
         </div>
         <span class="idea-card-stars">${'★'.repeat(i.potencial)}${'☆'.repeat(5 - i.potencial)}</span>
         <div class="idea-actions">
-          <button class="btn-idea-action" onclick="useIdeia('${escapeAttr(i.tema)}');showPage('dashboard')">Usar</button>
+          <button class="btn-idea-action" onclick="useIdeia(decodeURIComponent('${encodeInline(i.tema)}'));showPage('dashboard')">Usar</button>
           <button class="btn-idea-action danger" onclick="deleteIdeia(${i.id})">✕</button>
         </div>
       </div>
@@ -752,7 +750,7 @@ async function loadHistoricoPage() {
         <span class="history-modo ${h.modo}">${h.modo === 'pre' ? 'Pré-produção' : 'Pós-produção'}</span>
         <div class="history-info">
           <div class="history-tema">${escapeHtml(h.tema)}</div>
-          <div class="history-meta">${h.canal_nome} · ${formatDate(h.criado_em)}</div>
+          <div class="history-meta">${escapeHtml(h.canal_nome)} · ${formatDate(h.criado_em)}</div>
         </div>
         <span style="color:var(--text-muted);font-size:16px">→</span>
       </div>
@@ -819,6 +817,7 @@ async function loadConfig() {
       document.getElementById('youtubeKeyStatus').textContent = '✅ Chave configurada';
     }
 
+    if (isHostedRuntime) applyHostedConfigUi();
     onProviderChange();
   } catch (e) {}
 }
@@ -849,6 +848,62 @@ async function saveConfig() {
     loadConfig();
   } catch (e) {
     showToast(e.message, 'error');
+  }
+}
+
+function applyHostedConfigUi() {
+  const ollamaOption = document.querySelector('#cfgProvider option[value="ollama"]');
+  if (ollamaOption) {
+    ollamaOption.disabled = true;
+    ollamaOption.textContent = 'Ollama — disponível apenas no computador';
+  }
+  for (const id of ['cfgGeminiKey', 'cfgOpenaiKey', 'cfgYoutubeKey']) {
+    const input = document.getElementById(id);
+    if (!input) continue;
+    input.value = '';
+    input.disabled = true;
+    input.placeholder = 'Chave protegida na hospedagem';
+  }
+  document.querySelectorAll('.link-get-key').forEach(link => { link.style.display = 'none'; });
+  document.getElementById('mobileDataCard').style.display = 'block';
+}
+
+async function exportMobileBackup() {
+  try {
+    const counts = await window.RizomaMobile.exportBackup();
+    showToast(`Backup exportado: ${counts.canais} canais, ${counts.conteudos} conteúdos e ${counts.ideias} ideias.`);
+  } catch (error) {
+    showToast(error.message || 'Não foi possível exportar o backup.', 'error');
+  }
+}
+
+async function importMobileBackup(input) {
+  const file = input.files?.[0];
+  if (!file) return;
+  try {
+    if (!confirm('Importar este backup substituirá os dados atuais deste iPhone. Deseja continuar?')) return;
+    const counts = await window.RizomaMobile.importBackup(file);
+    localStorage.removeItem('rizoma_canal');
+    await loadChannels();
+    showToast(`Backup importado: ${counts.canais} canais, ${counts.conteudos} conteúdos e ${counts.ideias} ideias.`);
+  } catch (error) {
+    showToast(error.message || 'Backup inválido.', 'error');
+  } finally {
+    input.value = '';
+  }
+}
+
+async function updateStorageStatus() {
+  if (!isHostedRuntime || !window.RizomaMobile) return;
+  const element = document.getElementById('storageStatus');
+  try {
+    const status = await window.RizomaMobile.storageStatus();
+    element.textContent = status.persisted
+      ? '✅ Armazenamento persistente autorizado neste aparelho.'
+      : '⚠️ O iOS não garantiu persistência. Mantenha um backup recente em Downloads.';
+    element.classList.toggle('protected', status.persisted);
+  } catch {
+    element.textContent = '⚠️ Não foi possível confirmar a persistência. Mantenha um backup recente.';
   }
 }
 
@@ -885,9 +940,8 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-function escapeAttr(str) {
-  if (!str) return '';
-  return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+function encodeInline(str) {
+  return encodeURIComponent(String(str || '')).replace(/'/g, '%27');
 }
 
 function formatDate(dateStr) {
@@ -908,6 +962,12 @@ function formatDate(dateStr) {
 
 // ─── Inicialização ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  await window.RizomaPwa?.init();
+  if (isHostedRuntime) {
+    applyHostedConfigUi();
+    await window.RizomaMobile.openDatabase();
+    await updateStorageStatus();
+  }
   // Channel select listener
   document.getElementById('channelSelect').addEventListener('change', onChannelChange);
 

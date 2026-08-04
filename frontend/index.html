@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-runtime="local">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#39d353" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Rizoma" />
   <title>Rizoma — Um conteúdo. Todas as direções.</title>
   <meta name="description" content="Sua ferramenta pessoal de crescimento orgânico para criadores de conteúdo. Gere assets para todas as plataformas com um clique." />
+  <meta property="og:title" content="Rizoma — Um conteúdo. Todas as direções." />
+  <meta property="og:description" content="Sua ferramenta pessoal e privada de crescimento orgânico." />
+  <meta property="og:image" content="/og.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="/og.png" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/rizoma-192.png" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -52,7 +63,7 @@
   </nav>
 
   <div class="sidebar-footer">
-    <div class="version-badge">v1.0.5</div>
+    <div class="version-badge">v1.1.0</div>
   </div>
 </aside>
 
@@ -310,6 +321,21 @@
       <button class="btn-save-config" onclick="saveConfig()">💾 Salvar Configurações</button>
     </div>
 
+    <div class="config-card mobile-only-card" id="mobileDataCard" style="display:none">
+      <h3 class="config-section-title">📱 Dados neste iPhone</h3>
+      <p class="mobile-data-description">
+        Canais, ideias e histórico ficam somente neste aparelho. Exporte um backup regularmente,
+        pois limpar os dados do navegador ou remover o aplicativo pode apagá-los.
+      </p>
+      <div class="storage-status" id="storageStatus">Verificando proteção do armazenamento…</div>
+      <div class="backup-actions">
+        <button class="btn-secondary-sm" type="button" onclick="exportMobileBackup()">⬇️ Exportar backup</button>
+        <label class="btn-primary-sm backup-file-label" for="backupFileInput">⬆️ Importar backup</label>
+        <input id="backupFileInput" type="file" accept="application/json,.json" onchange="importMobileBackup(this)" hidden />
+      </div>
+      <small class="form-hint">O arquivo não contém suas chaves de API.</small>
+    </div>
+
     <div class="config-card">
       <h3 class="config-section-title">📖 Como Configurar</h3>
       <div class="how-to">
@@ -445,6 +471,8 @@
 <!-- Toast -->
 <div id="toast" class="toast"></div>
 
+<script src="/static/js/local-db.js"></script>
+<script src="/static/js/pwa.js"></script>
 <script src="/static/js/app.js"></script>
 </body>
 </html>

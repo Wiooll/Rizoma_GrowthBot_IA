@@ -34,7 +34,7 @@ def print_banner():
 
     banner = """
   ==========================================
-         R I Z O M A  -  v1.0.5
+         R I Z O M A  -  v1.1.0
       Um conteudo. Todas as direcoes.
   ==========================================
 

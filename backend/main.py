@@ -21,9 +21,10 @@ from .youtube import fetch_channel_stats
 
 # ─── App ──────────────────────────────────────────────────────────────────────
 
-app = FastAPI(title="Rizoma", version="1.0.5", docs_url=None, redoc_url=None)
+app = FastAPI(title="Rizoma", version="1.1.0", docs_url=None, redoc_url=None)
 
 FRONTEND_PATH = Path("frontend")
+PUBLIC_PATH = Path("public")
 
 
 @app.on_event("startup")
@@ -33,6 +34,22 @@ async def startup():
 
 # Arquivos estáticos (CSS, JS)
 app.mount("/static", StaticFiles(directory=str(FRONTEND_PATH)), name="static")
+app.mount("/icons", StaticFiles(directory=str(PUBLIC_PATH / "icons")), name="icons")
+
+
+@app.get("/manifest.webmanifest")
+async def manifest():
+    return FileResponse(str(PUBLIC_PATH / "manifest.webmanifest"), media_type="application/manifest+json")
+
+
+@app.get("/sw.js")
+async def service_worker():
+    return FileResponse(str(PUBLIC_PATH / "sw.js"), media_type="application/javascript")
+
+
+@app.get("/og.png")
+async def social_preview():
+    return FileResponse(str(PUBLIC_PATH / "og.png"), media_type="image/png")
 
 
 @app.get("/")
