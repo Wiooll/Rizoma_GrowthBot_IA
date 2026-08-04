@@ -31,5 +31,5 @@
 
 - [x] 5.1 Criar ou reutilizar o site, configurar acesso privado e registrar apenas metadados permitidos
 - [x] 5.2 Configurar Gemini, OpenAI e YouTube como segredos sem exibir seus valores
-- [ ] 5.3 Salvar e publicar a versão validada, confirmar o endereço e abrir a implantação
-- [ ] 5.4 Orientar instalação no iPhone e importação do backup, deixando a conferência final de contagens pronta
+- [x] 5.3 Salvar e publicar a versão validada, confirmar o endereço e abrir a implantação
+- [x] 5.4 Orientar instalação no iPhone e importação do backup, deixando a conferência final de contagens pronta
