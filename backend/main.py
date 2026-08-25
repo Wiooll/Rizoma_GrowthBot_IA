@@ -57,6 +57,12 @@ async def root():
     return FileResponse(str(FRONTEND_PATH / "index.html"))
 
 
+@app.get("/api/health")
+async def health():
+    init_db()
+    return {"status": "ok", "app": app.title, "version": app.version}
+
+
 # â”€â”€â”€ Canais â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class CanalPayload(BaseModel):

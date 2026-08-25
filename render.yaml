@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: rizoma
+    runtime: docker
+    plan: starter
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
+    disk:
+      name: rizoma-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: RIZOMA_HOST
+        value: 0.0.0.0
+      - key: RIZOMA_OPEN_BROWSER
+        value: "0"
+      - key: RIZOMA_DATA_DIR
+        value: /app/data
+      - key: RIZOMA_DB_PATH
+        value: /app/data/rizoma.db
+      - key: RIZOMA_CONFIG_PATH
+        value: /app/data/config.yaml
+      - key: LLM_PROVIDER
+        value: demo
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.1-flash-lite
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: YOUTUBE_API_KEY
+        sync: false

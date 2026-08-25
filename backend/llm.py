@@ -1,55 +1,71 @@
 """
-Rizoma — Adaptador de LLM
+Rizoma â€” Adaptador de LLM
 Suporta: Google Gemini, OpenAI GPT, Ollama (local) e modo Demo.
 """
 
 import json
+import os
 import yaml
 import httpx
 from pathlib import Path
 from typing import Optional
 
-CONFIG_PATH = Path("config.yaml")
+ENV_CONFIG_MAP = {
+    "GEMINI_API_KEY": "gemini_api_key",
+    "GEMINI_MODEL": "gemini_model",
+    "OLLAMA_MODEL": "ollama_model",
+    "OLLAMA_URL": "ollama_url",
+    "OPENAI_API_KEY": "openai_api_key",
+    "OPENAI_MODEL": "openai_model",
+    "LLM_PROVIDER": "provider",
+    "YOUTUBE_API_KEY": "youtube_api_key",
+}
 
-# ─── Config ───────────────────────────────────────────────────────────────────
+
+def _resolve_config_path() -> Path:
+    explicit_path = os.getenv("RIZOMA_CONFIG_PATH", "").strip()
+    if explicit_path:
+        return Path(explicit_path)
+    data_dir = os.getenv("RIZOMA_DATA_DIR", "").strip()
+    if data_dir:
+        return Path(data_dir) / "config.yaml"
+    return Path("config.yaml")
+
+
+CONFIG_PATH = _resolve_config_path()
+
+
+# â”€â”€â”€ Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def load_config() -> dict:
     config = {}
     if CONFIG_PATH.exists():
         with open(CONFIG_PATH, encoding="utf-8") as f:
             config = yaml.safe_load(f) or {}
-            
+
     if "llm" not in config:
         config["llm"] = {"provider": "demo"}
-        
-    import os
-    env_map = {
-        "GEMINI_API_KEY": "gemini_api_key",
-        "GEMINI_MODEL": "gemini_model",
-        "OLLAMA_MODEL": "ollama_model",
-        "OLLAMA_URL": "ollama_url",
-        "OPENAI_API_KEY": "openai_api_key",
-        "OPENAI_MODEL": "openai_model",
-        "LLM_PROVIDER": "provider",
-        "YOUTUBE_API_KEY": "youtube_api_key"
-    }
-    
-    for env_k, conf_k in env_map.items():
-        if val := os.environ.get(env_k):
-            config["llm"][conf_k] = val
-            
+
+    for env_key, conf_key in ENV_CONFIG_MAP.items():
+        env_value = os.environ.get(env_key)
+        if env_value:
+            config["llm"][conf_key] = env_value
+
     if "provider" not in config["llm"] or not config["llm"]["provider"]:
         config["llm"]["provider"] = "demo"
-            
+
     return config
 
 
 def save_config(config: dict):
+    CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    sanitized = yaml.safe_load(yaml.dump(config, default_flow_style=False, allow_unicode=True)) or {}
+    llm = sanitized.setdefault("llm", {})
+    for env_key, conf_key in ENV_CONFIG_MAP.items():
+        if os.environ.get(env_key):
+            llm.pop(conf_key, None)
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
-        yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
-
-
-# ─── Prompt Builder ───────────────────────────────────────────────────────────
+        yaml.dump(sanitized, f, default_flow_style=False, allow_unicode=True)
 
 def _build_prompt(tema: str, canal: dict, modo: str) -> str:
     plataformas = canal.get("plataformas", [])

@@ -14,3 +14,9 @@ venv
 .venv
 node_modules
 openspec
+config.yaml
+data
+dist
+*.db
+*.sqlite3
+*.log

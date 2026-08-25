@@ -1,22 +1,33 @@
 """
-Rizoma — Camada de banco de dados (SQLite)
-Gerencia canais, conteúdos gerados e ideias.
+Rizoma - Camada de banco de dados (SQLite)
+Gerencia canais, conteudos gerados e ideias.
 """
 
-import sqlite3
 import json
-from pathlib import Path
+import os
+import sqlite3
 from contextlib import contextmanager
+from pathlib import Path
 from typing import Optional
 
-DB_PATH = Path("data/rizoma.db")
+
+def _resolve_db_path() -> Path:
+    explicit_path = os.getenv("RIZOMA_DB_PATH", "").strip()
+    if explicit_path:
+        return Path(explicit_path)
+    data_dir = os.getenv("RIZOMA_DATA_DIR", "data").strip() or "data"
+    return Path(data_dir) / "rizoma.db"
+
+
+DB_PATH = _resolve_db_path()
 
 
 def init_db():
-    """Inicializa o banco criando as tabelas se não existirem."""
+    """Inicializa o banco criando as tabelas se nao existirem."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with get_db() as conn:
-        conn.executescript("""
+        conn.executescript(
+            """
             CREATE TABLE IF NOT EXISTS canais (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
                 nome        TEXT    NOT NULL,
@@ -47,16 +58,17 @@ def init_db():
                 criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (canal_id) REFERENCES canais(id) ON DELETE CASCADE
             );
-        """)
+            """
+        )
         try:
             conn.execute("ALTER TABLE canais ADD COLUMN youtube_url TEXT DEFAULT ''")
         except sqlite3.OperationalError:
-            pass  # Coluna já existe
+            pass
 
 
 @contextmanager
 def get_db():
-    """Context manager para conexão SQLite com auto-commit e rollback."""
+    """Context manager para conexao SQLite com auto-commit e rollback."""
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
@@ -71,8 +83,6 @@ def get_db():
         conn.close()
 
 
-# ─── Canais ───────────────────────────────────────────────────────────────────
-
 def criar_canal(nome: str, nicho: str, tom: str, publico: str, plataformas: list, youtube_url: str = "") -> int:
     with get_db() as conn:
         cur = conn.execute(
@@ -84,31 +94,26 @@ def criar_canal(nome: str, nicho: str, tom: str, publico: str, plataformas: list
 
 def listar_canais() -> list:
     with get_db() as conn:
-        rows = conn.execute(
-            "SELECT * FROM canais ORDER BY criado_em DESC"
-        ).fetchall()
+        rows = conn.execute("SELECT * FROM canais ORDER BY criado_em DESC").fetchall()
     result = []
-    for r in rows:
-        d = dict(r)
-        d["plataformas"] = json.loads(d["plataformas"] or "[]")
-        result.append(d)
+    for row in rows:
+        item = dict(row)
+        item["plataformas"] = json.loads(item["plataformas"] or "[]")
+        result.append(item)
     return result
 
 
 def obter_canal(canal_id: int) -> Optional[dict]:
     with get_db() as conn:
-        row = conn.execute(
-            "SELECT * FROM canais WHERE id = ?", (canal_id,)
-        ).fetchone()
+        row = conn.execute("SELECT * FROM canais WHERE id = ?", (canal_id,)).fetchone()
     if not row:
         return None
-    d = dict(row)
-    d["plataformas"] = json.loads(d["plataformas"] or "[]")
-    return d
+    item = dict(row)
+    item["plataformas"] = json.loads(item["plataformas"] or "[]")
+    return item
 
 
-def atualizar_canal(canal_id: int, nome: str, nicho: str, tom: str,
-                    publico: str, plataformas: list, youtube_url: str = ""):
+def atualizar_canal(canal_id: int, nome: str, nicho: str, tom: str, publico: str, plataformas: list, youtube_url: str = ""):
     with get_db() as conn:
         conn.execute(
             "UPDATE canais SET nome=?,nicho=?,tom=?,publico=?,plataformas=?,youtube_url=? WHERE id=?",
@@ -120,8 +125,6 @@ def deletar_canal(canal_id: int):
     with get_db() as conn:
         conn.execute("DELETE FROM canais WHERE id = ?", (canal_id,))
 
-
-# ─── Conteúdos ────────────────────────────────────────────────────────────────
 
 def salvar_conteudo(canal_id: int, tema: str, modo: str, dados: dict) -> int:
     with get_db() as conn:
@@ -151,25 +154,21 @@ def listar_historico(canal_id: Optional[int] = None, limit: int = 20) -> list:
                    ORDER BY c.criado_em DESC LIMIT ?""",
                 (limit,),
             ).fetchall()
-    return [dict(r) for r in rows]
+    return [dict(row) for row in rows]
 
 
 def obter_conteudo(conteudo_id: int) -> Optional[dict]:
     with get_db() as conn:
-        row = conn.execute(
-            "SELECT * FROM conteudos WHERE id = ?", (conteudo_id,)
-        ).fetchone()
+        row = conn.execute("SELECT * FROM conteudos WHERE id = ?", (conteudo_id,)).fetchone()
     if not row:
         return None
-    d = dict(row)
+    item = dict(row)
     try:
-        d["dados"] = json.loads(d["dados"] or "{}")
+        item["dados"] = json.loads(item["dados"] or "{}")
     except Exception:
-        d["dados"] = {}
-    return d
+        item["dados"] = {}
+    return item
 
-
-# ─── Ideias ───────────────────────────────────────────────────────────────────
 
 def salvar_ideia(canal_id: int, tema: str, potencial: int = 3) -> int:
     with get_db() as conn:
@@ -186,14 +185,12 @@ def listar_ideias(canal_id: int, limit: int = 10) -> list:
             "SELECT * FROM ideias WHERE canal_id = ? ORDER BY criado_em DESC LIMIT ?",
             (canal_id, limit),
         ).fetchall()
-    return [dict(r) for r in rows]
+    return [dict(row) for row in rows]
 
 
 def atualizar_status_ideia(ideia_id: int, status: str):
     with get_db() as conn:
-        conn.execute(
-            "UPDATE ideias SET status = ? WHERE id = ?", (status, ideia_id)
-        )
+        conn.execute("UPDATE ideias SET status = ? WHERE id = ?", (status, ideia_id))
 
 
 def deletar_ideia(ideia_id: int):
