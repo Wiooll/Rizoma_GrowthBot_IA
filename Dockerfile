@@ -12,7 +12,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend ./backend
 COPY frontend ./frontend
 COPY public ./public
-COPY data ./data
 COPY rizoma.py .
 
 EXPOSE 8000
