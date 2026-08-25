@@ -6,6 +6,7 @@ import httpx
 import re
 import time
 from typing import Optional
+from youtube_transcript_api import YouTubeTranscriptApi
 
 # Cache simples em memória: { "identificador": {"data": dict, "expires_at": float} }
 CACHE = {}
@@ -106,3 +107,60 @@ async def fetch_channel_stats(url: str, api_key: str) -> dict:
         return {"error": f"Erro na API do YouTube (Status {e.response.status_code})."}
     except Exception as e:
         return {"error": f"Falha ao conectar com o YouTube: {str(e)}"}
+
+
+def extract_video_id(url: str) -> Optional[str]:
+    """Extrai o ID de um vídeo do YouTube a partir da URL."""
+    if not url:
+        return None
+    
+    # Busca por v=XXXX ou youtu.be/XXXX ou shorts/XXXX
+    match = re.search(r"(?:v=|youtu\.be/|shorts/)([\w-]+)", url)
+    if match:
+        return match.group(1)
+        
+    # Se já tiver 11 caracteres exatos (ID cru)
+    url_stripped = url.strip()
+    if len(url_stripped) == 11 and "/" not in url_stripped:
+        return url_stripped
+        
+    return None
+
+
+def fetch_video_transcript(url: str) -> dict:
+    """
+    Busca a transcrição do vídeo e retorna formatada com timestamps.
+    """
+    video_id = extract_video_id(url)
+    if not video_id:
+        return {"error": "URL de vídeo inválida."}
+    
+    try:
+        # Busca a transcrição (tenta PT primeiro, depois EN)
+        transcript_list = YouTubeTranscriptApi().list(video_id)
+        try:
+            transcript = transcript_list.find_transcript(['pt', 'en', 'pt-BR'])
+        except:
+            try:
+                # Tenta gerada automaticamente
+                transcript = transcript_list.find_generated_transcript(['pt', 'en', 'pt-BR'])
+            except:
+                # Pega a primeira que achar
+                transcript = list(transcript_list)[0]
+
+        data = transcript.fetch()
+        
+        # Formatador customizado: "[mm:ss] texto"
+        linhas_formatadas = []
+        for item in data:
+            start_sec = int(item.start)
+            mins = start_sec // 60
+            secs = start_sec % 60
+            linhas_formatadas.append(f"[{mins:02d}:{secs:02d}] {item.text}")
+            
+        texto_final = "\\n".join(linhas_formatadas)
+        return {"transcript": texto_final, "video_id": video_id}
+        
+    except Exception as e:
+        return {"error": f"Erro ao buscar legenda: {str(e)}"}
+

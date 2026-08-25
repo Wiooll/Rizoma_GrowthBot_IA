@@ -1,6 +1,6 @@
 """
-Rizoma — API FastAPI
-Serve o frontend e expõe os endpoints REST.
+Rizoma â€” API FastAPI
+Serve o frontend e expÃµe os endpoints REST.
 """
 
 from fastapi import FastAPI, HTTPException
@@ -16,12 +16,12 @@ from .database import (
     salvar_conteudo, listar_historico, obter_conteudo,
     salvar_ideia, listar_ideias, atualizar_status_ideia, deletar_ideia,
 )
-from .llm import generate_content, load_config, save_config
-from .youtube import fetch_channel_stats
+from .llm import generate_content, load_config, save_config, generate_shorts_curation
+from .youtube import fetch_channel_stats, fetch_video_transcript
 
-# ─── App ──────────────────────────────────────────────────────────────────────
+# â”€â”€â”€ App â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-app = FastAPI(title="Rizoma", version="1.1.0", docs_url=None, redoc_url=None)
+app = FastAPI(title="Rizoma", version="1.2.0", docs_url=None, redoc_url=None)
 
 FRONTEND_PATH = Path("frontend")
 PUBLIC_PATH = Path("public")
@@ -32,7 +32,7 @@ async def startup():
     init_db()
 
 
-# Arquivos estáticos (CSS, JS)
+# Arquivos estÃ¡ticos (CSS, JS)
 app.mount("/static", StaticFiles(directory=str(FRONTEND_PATH)), name="static")
 app.mount("/icons", StaticFiles(directory=str(PUBLIC_PATH / "icons")), name="icons")
 
@@ -57,7 +57,7 @@ async def root():
     return FileResponse(str(FRONTEND_PATH / "index.html"))
 
 
-# ─── Canais ───────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Canais â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class CanalPayload(BaseModel):
     nome: str
@@ -82,7 +82,7 @@ async def post_canal(data: CanalPayload):
 @app.put("/api/canais/{canal_id}")
 async def put_canal(canal_id: int, data: CanalPayload):
     if not obter_canal(canal_id):
-        raise HTTPException(404, "Canal não encontrado")
+        raise HTTPException(404, "Canal nÃ£o encontrado")
     atualizar_canal(canal_id, data.nome, data.nicho, data.tom, data.publico, data.plataformas, data.youtube_url)
     return {"ok": True}
 
@@ -90,12 +90,12 @@ async def put_canal(canal_id: int, data: CanalPayload):
 @app.delete("/api/canais/{canal_id}")
 async def delete_canal(canal_id: int):
     if not obter_canal(canal_id):
-        raise HTTPException(404, "Canal não encontrado")
+        raise HTTPException(404, "Canal nÃ£o encontrado")
     deletar_canal(canal_id)
     return {"ok": True}
 
 
-# ─── Geração de Conteúdo ──────────────────────────────────────────────────────
+# â”€â”€â”€ GeraÃ§Ã£o de ConteÃºdo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class GerarPayload(BaseModel):
     canal_id: int
@@ -107,13 +107,13 @@ class GerarPayload(BaseModel):
 async def post_gerar(data: GerarPayload):
     canal = obter_canal(data.canal_id)
     if not canal:
-        raise HTTPException(404, "Canal não encontrado")
+        raise HTTPException(404, "Canal nÃ£o encontrado")
 
     if not data.tema.strip():
-        raise HTTPException(400, "Informe o tema ou título do conteúdo")
+        raise HTTPException(400, "Informe o tema ou tÃ­tulo do conteÃºdo")
 
     if data.modo not in ("pre", "pos"):
-        raise HTTPException(400, "Modo inválido. Use 'pre' ou 'pos'")
+        raise HTTPException(400, "Modo invÃ¡lido. Use 'pre' ou 'pos'")
 
     try:
         resultado = await generate_content(data.tema.strip(), canal, data.modo)
@@ -122,10 +122,38 @@ async def post_gerar(data: GerarPayload):
     except ValueError as e:
         raise HTTPException(400, str(e))
     except Exception as e:
-        raise HTTPException(500, f"Erro interno ao gerar conteúdo: {e}")
+        raise HTTPException(500, f"Erro interno ao gerar conteÃºdo: {e}")
 
 
-# ─── Histórico ────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Garimpo de Cortes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+class ExtractShortsPayload(BaseModel):
+    url: str
+
+
+@app.post("/api/extract-shorts")
+async def post_extract_shorts(data: ExtractShortsPayload):
+    if not data.url.strip():
+        raise HTTPException(400, "Informe a URL do vÃ­deo do YouTube")
+
+    # 1. Extrai a transcriÃ§Ã£o
+    transcript_result = fetch_video_transcript(data.url)
+    if "error" in transcript_result:
+        raise HTTPException(400, transcript_result["error"])
+        
+    transcript_text = transcript_result["transcript"]
+    
+    # 2. Chama a IA para curadoria
+    try:
+        resultado = await generate_shorts_curation(transcript_text)
+        return {"resultado": resultado, "video_id": transcript_result["video_id"]}
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        raise HTTPException(500, f"Erro interno na extraÃ§Ã£o: {e}")
+
+
+# â”€â”€â”€ HistÃ³rico â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @app.get("/api/historico")
 async def get_historico(canal_id: Optional[int] = None, limit: int = 30):
@@ -136,11 +164,11 @@ async def get_historico(canal_id: Optional[int] = None, limit: int = 30):
 async def get_conteudo(conteudo_id: int):
     conteudo = obter_conteudo(conteudo_id)
     if not conteudo:
-        raise HTTPException(404, "Conteúdo não encontrado")
+        raise HTTPException(404, "ConteÃºdo nÃ£o encontrado")
     return conteudo
 
 
-# ─── Ideias ───────────────────────────────────────────────────────────────────
+# â”€â”€â”€ Ideias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 class IdeiaPayload(BaseModel):
     canal_id: int
@@ -175,7 +203,7 @@ async def delete_ideia_route(ideia_id: int):
     return {"ok": True}
 
 
-# ─── Configurações ────────────────────────────────────────────────────────────
+# â”€â”€â”€ ConfiguraÃ§Ãµes â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @app.get("/api/config")
 async def get_config():
@@ -217,7 +245,7 @@ async def put_config(data: ConfigPayload):
     llm["ollama_url"] = data.ollama_url
     llm["ollama_model"] = data.ollama_model
 
-    # Só atualiza a chave se foi enviada (não está vazia ou mascarada)
+    # SÃ³ atualiza a chave se foi enviada (nÃ£o estÃ¡ vazia ou mascarada)
     if data.gemini_api_key and not data.gemini_api_key.startswith("***"):
         llm["gemini_api_key"] = data.gemini_api_key
     if data.openai_api_key and not data.openai_api_key.startswith("***"):
@@ -230,13 +258,13 @@ async def put_config(data: ConfigPayload):
     return {"ok": True}
 
 
-# ─── YouTube ──────────────────────────────────────────────────────────────────
+# â”€â”€â”€ YouTube â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @app.get("/api/youtube/stats/{canal_id}")
 async def get_youtube_stats(canal_id: int):
     canal = obter_canal(canal_id)
     if not canal:
-        raise HTTPException(404, "Canal não encontrado")
+        raise HTTPException(404, "Canal nÃ£o encontrado")
 
     youtube_url = canal.get("youtube_url")
     if not youtube_url:
@@ -248,14 +276,14 @@ async def get_youtube_stats(canal_id: int):
     stats = await fetch_channel_stats(youtube_url, api_key)
     
     if "error" in stats:
-        # Se houver erro, retornamos zero para não quebrar a UI,
+        # Se houver erro, retornamos zero para nÃ£o quebrar a UI,
         # ou a UI pode tratar o erro dependendo do design.
         return {"subscriberCount": "0", "viewCount": "0", "videoCount": "0", "_error": stats["error"]}
 
     return stats
 
 
-# ─── Tendências (Phase 2 placeholder) ────────────────────────────────────────
+# â”€â”€â”€ TendÃªncias (Phase 2 placeholder) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 TREND_SAMPLES = {
     "tecnologia": [
@@ -272,11 +300,11 @@ TREND_SAMPLES = {
         ("Jogos gratuitos que todo gamer deve jogar", 3),
         ("IA nos jogos: o futuro dos NPCs", 3),
     ],
-    "reflexões": [
+    "reflexÃµes": [
         ("Como parar de procrastinar de verdade", 5),
         ("Filosofia estoica aplicada hoje", 4),
         ("Digital Minimalism: como fiz o detox", 4),
-        ("Hábitos de leitura que mudaram minha vida", 3),
+        ("HÃ¡bitos de leitura que mudaram minha vida", 3),
         ("Por que a maioria desiste dos objetivos", 3),
     ],
 }
@@ -287,7 +315,7 @@ async def get_trends(canal_id: int):
     canal = obter_canal(canal_id)
     nicho = canal.get("nicho", "tecnologia").lower() if canal else "tecnologia"
 
-    # Tenta encontrar o nicho mais próximo
+    # Tenta encontrar o nicho mais prÃ³ximo
     trends_data = TREND_SAMPLES.get(nicho)
     if not trends_data:
         for key in TREND_SAMPLES:
@@ -303,6 +331,6 @@ async def get_trends(canal_id: int):
             for t, p in trends_data
         ],
         "fase": 2,
-        "nota": "Integração com Google Trends e Reddit disponível na Fase 2",
+        "nota": "IntegraÃ§Ã£o com Google Trends e Reddit disponÃ­vel na Fase 2",
     }
 

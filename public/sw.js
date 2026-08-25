@@ -1,9 +1,10 @@
-const CACHE_NAME = 'rizoma-shell-v1.1.0';
+const CACHE_NAME = 'rizoma-shell-v1.2.0';
 const SHELL = [
   '/index.html',
   '/manifest.webmanifest',
   '/static/css/style.css',
   '/static/js/local-db.js',
+  '/static/js/hosted-cloud.js',
   '/static/js/pwa.js',
   '/static/js/app.js',
   '/icons/rizoma-192.png',

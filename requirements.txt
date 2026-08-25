@@ -4,6 +4,7 @@ uvicorn[standard]>=0.27.0
 pyyaml>=6.0
 httpx>=0.26.0
 python-multipart>=0.0.6
+youtube-transcript-api>=0.6.2
 
 # LLM Providers (instale o que for usar)
 google-genai>=0.2.0   # Google Gemini (recomendado, gratuito)

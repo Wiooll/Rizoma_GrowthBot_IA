@@ -307,3 +307,77 @@ async def generate_content(tema: str, canal: dict, modo: str) -> dict:
 
     else:
         return _demo_response(tema)
+
+
+def _build_shorts_prompt(transcript: str) -> str:
+    return f"""Você é um produtor viral especialista em retenção para YouTube Shorts, TikTok e Reels.
+Sua missão é extrair exatamente os 3 melhores trechos da transcrição de um vídeo longo que tenham o maior potencial de viralizar.
+
+REGRA DE SELEÇÃO:
+- Os cortes devem ter entre 30 e 60 segundos.
+- Precisam de um gancho forte (hook) nas primeiras palavras.
+- Precisam ter um começo claro e um fim natural.
+
+TRANSCRIÇÃO DO VÍDEO (com timestamps):
+{transcript[:30000]}
+
+INSTRUÇÕES:
+- Responda SOMENTE com JSON válido.
+- O formato deve ser um objeto JSON contendo um array de objetos na chave "cortes".
+
+Retorne EXATAMENTE neste formato JSON:
+{{
+  "cortes": [
+    {{
+      "tempo_inicial": "01:15",
+      "tempo_final": "02:00",
+      "gancho": "A frase de impacto que inicia o corte",
+      "legenda": "Legenda sugerida para o post (Instagram/TikTok) com hashtags",
+      "dica_edicao": "Instrução de edição, ex: 'dar zoom rápido nesta parte'"
+    }},
+    {{ ... }},
+    {{ ... }}
+  ]
+}}
+"""
+
+async def generate_shorts_curation(transcript: str) -> dict:
+    """Extrai os melhores trechos de shorts de uma transcrição."""
+    config = load_config()
+    llm = config.get("llm", {})
+    provider = llm.get("provider", "demo")
+
+    if provider == "demo":
+        return {
+            "cortes": [
+                {
+                    "tempo_inicial": "00:00",
+                    "tempo_final": "00:30",
+                    "gancho": "[DEMO] Configure sua chave de API",
+                    "legenda": "Este é um modo de demonstração. Acesse as configurações e adicione a chave do Gemini/OpenAI.",
+                    "dica_edicao": "Coloque a API key nas Configurações"
+                }
+            ]
+        }
+
+    prompt = _build_shorts_prompt(transcript)
+
+    if provider == "gemini":
+        api_key = llm.get("gemini_api_key", "")
+        if not api_key:
+            raise ValueError("Chave do Gemini não configurada.")
+        model = llm.get("gemini_model", "gemini-3.1-flash-lite")
+        return await _call_gemini(prompt, api_key, model)
+
+    elif provider == "openai":
+        api_key = llm.get("openai_api_key", "")
+        if not api_key:
+            raise ValueError("Chave da OpenAI não configurada.")
+        model = llm.get("openai_model", "gpt-4o-mini")
+        return await _call_openai(prompt, api_key, model)
+
+    elif provider == "ollama":
+        url = llm.get("ollama_url", "http://localhost:11434")
+        model = llm.get("ollama_model", "llama3")
+        return await _call_ollama(prompt, url, model)
+

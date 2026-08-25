@@ -116,7 +116,7 @@ function renderChannelSelect() {
 
 function onChannelChange() {
   const sel = document.getElementById('channelSelect');
-  const id = parseInt(sel.value);
+  const id = sel.value ? String(sel.value) : ''; 
   if (!id) {
     state.currentChannel = null;
     document.getElementById('editChannelBtn').style.display = 'none';
@@ -128,7 +128,7 @@ function onChannelChange() {
     if (document.getElementById('page-canais')?.classList.contains('active')) renderGestaoCanais();
     return;
   }
-  state.currentChannel = state.channels.find(c => c.id === id);
+  state.currentChannel = state.channels.find(c => String(c.id) === id);
   localStorage.setItem('rizoma_canal', String(id));
   document.getElementById('editChannelBtn').style.display = 'flex';
   document.getElementById('dashTitle').textContent = state.currentChannel.nome;
@@ -275,9 +275,9 @@ function renderGestaoCanais() {
         </div>
 
         <div class="channel-card-actions">
-          <button class="btn-secondary-sm" onclick="selectChannelAndShow(${c.id}, 'dashboard')">Produzir</button>
-          <button class="btn-secondary-sm" onclick="selectChannelAndShow(${c.id}, 'historico')">Histórico</button>
-          <button class="btn-primary-sm" onclick="selectChannelAndShow(${c.id}, 'dashboard');openEditChannel()">Editar</button>
+          <button class="btn-secondary-sm" onclick="selectChannelAndShow(decodeURIComponent('${encodeInline(String(c.id))}'), 'dashboard')">Produzir</button>
+          <button class="btn-secondary-sm" onclick="selectChannelAndShow(decodeURIComponent('${encodeInline(String(c.id))}'), 'historico')">Histórico</button>
+          <button class="btn-primary-sm" onclick="selectChannelAndShow(decodeURIComponent('${encodeInline(String(c.id))}'), 'dashboard');openEditChannel()">Editar</button>
         </div>
       </div>
     `;
@@ -659,7 +659,7 @@ async function loadIdeiasPage() {
         <span class="idea-card-stars">${'★'.repeat(i.potencial)}${'☆'.repeat(5 - i.potencial)}</span>
         <div class="idea-actions">
           <button class="btn-idea-action" onclick="useIdeia(decodeURIComponent('${encodeInline(i.tema)}'));showPage('dashboard')">Usar</button>
-          <button class="btn-idea-action danger" onclick="deleteIdeia(${i.id})">✕</button>
+          <button class="btn-idea-action danger" onclick="deleteIdeia(decodeURIComponent('${encodeInline(String(i.id))}'))">✕</button>
         </div>
       </div>
     `).join('');
@@ -727,7 +727,7 @@ async function loadRecentList() {
       return;
     }
     el.innerHTML = items.map(h => `
-      <div class="recent-item" onclick="openHistDetail(${h.id})">
+      <div class="recent-item" onclick="openHistDetail(decodeURIComponent('${encodeInline(String(h.id))}'))">
         <span class="recent-modo ${h.modo}">${h.modo === 'pre' ? 'Pré' : 'Pós'}</span>
         <span class="recent-text">${escapeHtml(h.tema)}</span>
         <span class="recent-date">${formatDate(h.criado_em)}</span>
@@ -746,7 +746,7 @@ async function loadHistoricoPage() {
       return;
     }
     el.innerHTML = items.map(h => `
-      <div class="history-card" onclick="openHistDetail(${h.id})">
+      <div class="history-card" onclick="openHistDetail(decodeURIComponent('${encodeInline(String(h.id))}'))">
         <span class="history-modo ${h.modo}">${h.modo === 'pre' ? 'Pré-produção' : 'Pós-produção'}</span>
         <div class="history-info">
           <div class="history-tema">${escapeHtml(h.tema)}</div>
@@ -817,7 +817,11 @@ async function loadConfig() {
       document.getElementById('youtubeKeyStatus').textContent = '✅ Chave configurada';
     }
 
-    if (isHostedRuntime) applyHostedConfigUi();
+    if (isHostedRuntime) {
+      window.__rizomaHostedSession = cfg.session || null;
+      window.__rizomaHostedVersion = cfg.app_version || '1.2.0';
+      applyHostedConfigUi();
+    }
     onProviderChange();
   } catch (e) {}
 }
@@ -855,17 +859,35 @@ function applyHostedConfigUi() {
   const ollamaOption = document.querySelector('#cfgProvider option[value="ollama"]');
   if (ollamaOption) {
     ollamaOption.disabled = true;
-    ollamaOption.textContent = 'Ollama — disponível apenas no computador';
+    ollamaOption.textContent = 'Ollama - disponivel apenas no computador';
   }
   for (const id of ['cfgGeminiKey', 'cfgOpenaiKey', 'cfgYoutubeKey']) {
     const input = document.getElementById(id);
     if (!input) continue;
     input.value = '';
-    input.disabled = true;
-    input.placeholder = 'Chave protegida na hospedagem';
+    input.disabled = false;
+    input.placeholder = 'Cole ou substitua sua chave pessoal';
   }
-  document.querySelectorAll('.link-get-key').forEach(link => { link.style.display = 'none'; });
-  document.getElementById('mobileDataCard').style.display = 'block';
+  document.getElementById('cfgOllamaUrl').value = '';
+  document.getElementById('cfgOllamaModel').value = '';
+  const card = document.getElementById('mobileDataCard');
+  if (card) {
+    const email = window.__rizomaHostedSession?.user?.email || 'Conta protegida';
+    const version = window.__rizomaHostedVersion || '1.2.0';
+    card.style.display = 'block';
+    card.innerHTML =
+      '<h3 class="config-section-title">Dados na sua conta</h3>' +
+      '<p class="mobile-data-description">Voce esta usando <strong>' + escapeHtml(email) + '</strong>. Seus canais, ideias, historico e preferencias sincronizam entre celular e computador.</p>' +
+      '<div class="storage-status" id="storageStatus">Verificando conexao...</div>' +
+      '<div class="backup-actions">' +
+      '<button class="btn-secondary-sm" type="button" onclick="exportMobileBackup()">Exportar backup</button>' +
+      '<label class="btn-primary-sm backup-file-label" for="backupFileInput">Importar backup</label>' +
+      '<button class="btn-secondary-sm" type="button" onclick="deleteHostedAccount()">Excluir conta</button>' +
+      '<input id="backupFileInput" type="file" accept="application/json,.json" onchange="importMobileBackup(this)" hidden />' +
+      '</div>' +
+      '<small class="form-hint">Versao hospedada v' + escapeHtml(String(version)) + '. O backup nao inclui suas chaves de API.</small>' +
+      '<div class="info-box" style="margin-top:12px">Excluir os dados do Rizoma nao remove sozinho o convite no Cloudflare Access. Se o seu e-mail continuar aprovado la, um novo perfil vazio podera ser criado no proximo login.</div>';
+  }
 }
 
 async function exportMobileBackup() {
@@ -896,18 +918,27 @@ async function importMobileBackup(input) {
 async function updateStorageStatus() {
   if (!isHostedRuntime || !window.RizomaMobile) return;
   const element = document.getElementById('storageStatus');
-  try {
-    const status = await window.RizomaMobile.storageStatus();
-    element.textContent = status.persisted
-      ? '✅ Armazenamento persistente autorizado neste aparelho.'
-      : '⚠️ O iOS não garantiu persistência. Mantenha um backup recente em Downloads.';
-    element.classList.toggle('protected', status.persisted);
-  } catch {
-    element.textContent = '⚠️ Não foi possível confirmar a persistência. Mantenha um backup recente.';
-  }
+  if (!element) return;
+  const online = navigator.onLine !== false;
+  element.textContent = online
+    ? 'Seus dados sincronizam pela sua conta. O shell pode abrir offline, mas salvar, consultar e gerar exigem internet.'
+    : 'Sem internet no momento. O Rizoma pode abrir o shell, mas consultar, salvar e gerar conteudo estao bloqueados ate a conexao voltar.';
+  element.classList.toggle('protected', online);
 }
 
 // ─── Utilitários ──────────────────────────────────────────────────────────────
+async function deleteHostedAccount() {
+  if (!confirm('Isso vai excluir seus dados ativos, preferencias, chaves pessoais e backups controlados pelo Rizoma. Deseja continuar?')) return;
+  if (!confirm('Confirme novamente: esta acao e irreversivel no aplicativo.')) return;
+  try {
+    await window.RizomaMobile.deleteAccount();
+    showToast('Conta removida. Se o seu e-mail continuar convidado, um novo perfil vazio podera ser criado no proximo login.');
+    setTimeout(() => { window.location.href = '/'; }, 1200);
+  } catch (error) {
+    showToast(error.message || 'Nao foi possivel excluir a conta.', 'error');
+  }
+}
+
 function copyAsset(elementId, btn) {
   const el = document.getElementById(elementId);
   if (!el) return;
@@ -967,6 +998,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     applyHostedConfigUi();
     await window.RizomaMobile.openDatabase();
     await updateStorageStatus();
+    window.addEventListener('online', updateStorageStatus);
+    window.addEventListener('offline', updateStorageStatus);
   }
   // Channel select listener
   document.getElementById('channelSelect').addEventListener('change', onChannelChange);
@@ -978,3 +1011,60 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   await loadChannels();
 });
+// ─── Garimpo de Cortes ────────────────────────────────────────────────────────
+
+async function extrairCortes() {
+  const urlInput = document.getElementById('urlCortesInput');
+  const resultArea = document.getElementById('cortesResultArea');
+  const btn = document.getElementById('btnExtrairCortes');
+  
+  const url = urlInput.value.trim();
+  if (!url) {
+    showToast('Informe a URL do vídeo', 'error');
+    return;
+  }
+
+  btn.classList.add('loading');
+  const btnText = btn.querySelector('.btn-text');
+  const oldText = btnText.textContent;
+  btnText.textContent = 'Extraindo legendas e analisando...';
+  
+  resultArea.innerHTML = '<div class="empty-msg centered">Minerando ouro... Isso pode levar alguns segundos.</div>';
+
+  try {
+    const payload = await api.post('/api/extract-shorts', { url });
+    
+    // Render result
+    if (payload.resultado && payload.resultado.cortes && payload.resultado.cortes.length > 0) {
+      let html = '';
+      payload.resultado.cortes.forEach((corte, idx) => {
+        html += `
+          <div class="history-item">
+            <div class="history-header">
+              <div class="history-meta">
+                <span class="history-badge">Corte ${idx + 1}</span>
+                <span class="history-time">⏱️ ${corte.tempo_inicial} até ${corte.tempo_final}</span>
+              </div>
+            </div>
+            <div class="history-body">
+              <strong>🎣 Gancho:</strong> ${corte.gancho}<br><br>
+              <strong>📝 Legenda:</strong> ${corte.legenda}<br><br>
+              <strong>🎬 Dica de Edição:</strong> ${corte.dica_edicao}
+            </div>
+          </div>
+        `;
+      });
+      resultArea.innerHTML = html;
+      showToast('Cortes extraídos com sucesso!');
+    } else {
+      resultArea.innerHTML = '<div class="empty-msg centered">A IA não retornou cortes válidos. Tente novamente.</div>';
+    }
+
+  } catch (err) {
+    showToast(err.message, 'error');
+    resultArea.innerHTML = '<div class="empty-msg centered">Erro na extração. Verifique se o vídeo possui legendas disponíveis.</div>';
+  } finally {
+    btn.classList.remove('loading');
+    btnText.textContent = oldText;
+  }
+}

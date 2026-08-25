@@ -1,0 +1,33 @@
+{
+  "name": "rizoma-hosted",
+  "main": "worker.js",
+  "compatibility_date": "2026-08-18",
+  "assets": {
+    "directory": "../dist/client"
+  },
+  "vars": {
+    "APP_VERSION": "1.2.0",
+    "ACCESS_ISSUER": "https://SEU-TIME.cloudflareaccess.com",
+    "ACCESS_AUDIENCE": "AUDIENCE_DO_WORKER",
+    "ACCESS_JWKS_URL": "https://SEU-TIME.cloudflareaccess.com/cdn-cgi/access/certs",
+    "RIZOMA_RUNTIME": "hosted"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "rizoma-hosted",
+      "database_id": "SUBSTITUA_FORA_DO_GIT",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BACKUPS",
+      "bucket_name": "rizoma-backups",
+      "preview_bucket_name": "rizoma-backups-preview"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

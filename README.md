@@ -34,40 +34,31 @@ Para acessar em outros dispositivos na rede, utilize `http://<seu-ip-local>:8000
 
 ---
 
-## 📱 Versão móvel privada
+## Hospedagem convidada v1.2.0
 
-A versão **v1.1.0** pode ser instalada como PWA no iPhone e usada com o computador desligado. A interface permanece hospedada, mas canais, ideias, histórico e preferências ficam somente no armazenamento local do aparelho.
+A versao hospedada **v1.2.0** roda em Cloudflare Worker com autenticao Google via Cloudflare Access, acesso restrito a pessoas convidadas e sincronizacao por conta.
 
-### Instalar no iPhone
+### O que muda na hospedagem
 
-1. Abra o endereço privado publicado usando o Chrome no iPhone.
-2. Entre com a conta autorizada do proprietário.
-3. No menu de compartilhamento, escolha **Adicionar à Tela de Início**.
-4. Abra o ícone **Rizoma** criado na tela inicial.
-5. Acesse **Configurações → Dados neste iPhone** e importe o backup da migração.
+- Cada usuario convidado tem seus proprios canais, ideias, historico e preferencias.
+- A PWA hospedada usa Cloudflare D1 como fonte de verdade e sincroniza celular e computador.
+- Cada usuario salva sua propria chave Gemini, OpenAI e YouTube; a aplicacao armazena essas chaves criptografadas.
+- O shell da PWA pode abrir offline, mas salvar, consultar e gerar conteudo exigem internet.
+- Exportacao e importacao de backup continuam disponiveis, sem incluir chaves pessoais.
+- Excluir a conta remove os dados ativos do Rizoma, mas o convite no Cloudflare Access precisa ser revogado manualmente pelo proprietario.
 
-### Migrar os dados atuais
+### Arquivos e configuracao da hospedagem
 
-No computador, gere um arquivo sem chaves de API:
+- Exemplo de Worker: `hosted/wrangler.jsonc.example`
+- Migracao inicial D1: `hosted/migrations/0001_multiuser_hosting.sql`
+- Worker hospedado: `hosted/worker_v12.js`
+- Repositorio multiusuario: `hosted/repository.js`
 
-```bash
-python scripts/export_mobile_backup.py
-```
+### Validacao da versao hospedada
 
-O arquivo será criado em `data/rizoma-mobile-backup.json` e permanecerá ignorado pelo Git. Transfira-o ao aplicativo Arquivos do iPhone por um meio de sua confiança e selecione **Importar backup**. A importação valida o conteúdo antes de substituir o banco local.
-
-### Build e validação móvel
-
-```bash
-npm install
-npm test
-npm run spellcheck
-npm run build
-```
-
-As chaves `GEMINI_API_KEY`, `OPENAI_API_KEY` e `YOUTUBE_API_KEY` devem ser cadastradas somente como segredos da hospedagem. A versão móvel não salva essas chaves no navegador. O Ollama continua disponível apenas no modo local do computador.
-
-> Exporte backups regularmente. O iOS pode apagar os dados se o aplicativo for removido, se os dados do site forem limpos ou em situações de pressão de armazenamento.
+`npm test`
+`npm run spellcheck`
+`npm run build`
 
 ---
 
@@ -118,7 +109,7 @@ rizoma/
 
 ---
 
-## 🌿 Funcionalidades — v1.1.0
+## 🌿 Funcionalidades - v1.2.0
 
 ### ⚡ Geração de Conteúdo
 - **Pós-produção**: insira o tema de um vídeo já gravado → receba todos os assets prontos
@@ -161,7 +152,14 @@ No computador, os dados ficam em `data/rizoma.db`. Na PWA, canais, ideias, hist�
 
 ---
 
-## 📝 Changelog
+## Changelog
+
+### v1.2.0 (2026-08-18)
+- Adiciona Worker hospedado com validacao do JWT do Cloudflare Access e isolamento por usuario.
+- Adiciona modelo multiusuario com persistencia sincronizada no D1 e conflito otimista por versao.
+- Adiciona cadastro de chaves pessoais Gemini, OpenAI e YouTube com criptografia no Worker.
+- Adiciona exportacao, importacao e exclusao de conta para a variante hospedada.
+- Mantem o runtime local em FastAPI/SQLite separado da variante hospedada.
 
 ### v1.1.0 (2026-08-04)
 - Adiciona PWA privada instalável no iPhone, mantendo o visual original.

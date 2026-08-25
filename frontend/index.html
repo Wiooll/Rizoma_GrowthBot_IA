@@ -7,26 +7,26 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Rizoma" />
-  <title>Rizoma — Um conteúdo. Todas as direções.</title>
-  <meta name="description" content="Sua ferramenta pessoal de crescimento orgânico para criadores de conteúdo. Gere assets para todas as plataformas com um clique." />
-  <meta property="og:title" content="Rizoma — Um conteúdo. Todas as direções." />
-  <meta property="og:description" content="Sua ferramenta pessoal e privada de crescimento orgânico." />
+  <title>Rizoma &mdash; Um conte&uacute;do. Todas as dire&ccedil;&otilde;es.</title>
+  <meta name="description" content="Sua ferramenta pessoal de crescimento org&acirc;nico para criadores de conte&uacute;do. Gere assets para todas as plataformas com um clique." />
+  <meta property="og:title" content="Rizoma &mdash; Um conte&uacute;do. Todas as dire&ccedil;&otilde;es." />
+  <meta property="og:description" content="Sua ferramenta pessoal e privada de crescimento org&acirc;nico." />
   <meta property="og:image" content="/og.png" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:image" content="/og.png" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/icons/rizoma-192.png" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>R</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════ SIDEBAR -->
+<!-- """"""""""""""""""""""""""""""""""""""""""""""""""""""""""" SIDEBAR -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="logo-mark">🌿</div>
+    <div class="logo-mark">R</div>
     <div class="logo-text">
       <span class="logo-name">Rizoma</span>
       <span class="logo-tagline">GrowthBot AI</span>
@@ -37,76 +37,79 @@
     <div class="channel-label">Canal Ativo</div>
     <div class="channel-row">
       <select id="channelSelect" class="channel-select">
-        <option value="">— Selecione —</option>
+        <option value=""> Selecione </option>
       </select>
-      <button class="btn-icon-round" id="editChannelBtn" onclick="openEditChannel()" title="Editar canal" style="display:none">✏️</button>
+      <button class="btn-icon-round" id="editChannelBtn" onclick="openEditChannel()" title="Editar canal" style="display:none">&#9998;</button>
     </div>
     <button class="btn-new-channel" onclick="openModal('channelModal', 'create')">+ Novo Canal</button>
   </div>
 
   <nav class="sidebar-nav">
     <a class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
-      <span class="nav-icon">🏠</span><span>Dashboard</span>
+      <span class="nav-icon">&#8962;</span><span>Dashboard</span>
+    </a>
+    <a class="nav-item" data-page="cortes" onclick="showPage('cortes')">
+      <span class="nav-icon">&#9986;</span><span>Extrair Cortes</span>
     </a>
     <a class="nav-item" data-page="canais" onclick="showPage('canais')">
-      <span class="nav-icon">📺</span><span>Gestão de Canais</span>
+      <span class="nav-icon">&#128250;</span><span>Gest&atilde;o de Canais</span>
     </a>
     <a class="nav-item" data-page="historico" onclick="showPage('historico')">
-      <span class="nav-icon">📚</span><span>Histórico</span>
+      <span class="nav-icon">&#128220;</span><span>Hist&oacute;rico</span>
     </a>
     <a class="nav-item" data-page="ideias" onclick="showPage('ideias')">
-      <span class="nav-icon">💡</span><span>Ideias</span>
+      <span class="nav-icon">&#128161;</span><span>Ideias</span>
     </a>
     <a class="nav-item" data-page="config" onclick="showPage('config')">
-      <span class="nav-icon">⚙️</span><span>Configurações</span>
+      <span class="nav-icon">&#9881;</span><span>Configura&ccedil;&otilde;es</span>
     </a>
   </nav>
 
   <div class="sidebar-footer">
-    <div class="version-badge">v1.1.0</div>
+    <div class="version-badge">v1.2.0</div>
   </div>
 </aside>
 
-<!-- ════════════════════════════════════════════════════════ MAIN CONTENT -->
+<!-- """""""""""""""""""""""""""""""""""""""""""""""""""""""" MAIN CONTENT -->
 <main class="main-content">
 
-  <!-- ░░░ DASHBOARD ░░░ -->
+  <!--  DASHBOARD  -->
   <div id="page-dashboard" class="page active">
     <div class="page-header">
       <div>
         <h1 id="dashTitle">Dashboard</h1>
-        <p class="page-subtitle" id="dashSubtitle">Selecione um canal para começar</p>
+        <p class="page-subtitle" id="dashSubtitle">Selecione um canal para come&ccedil;ar</p>
       </div>
     </div>
 
     <div class="dashboard-grid">
 
-      <!-- BLOCO 1: Criar Conteúdo -->
+      <!-- BLOCO 1: Criar Conteudo -->
       <div class="card card-create">
         <div class="card-header">
-          <h2 class="card-title">⚡ Criar Conteúdo</h2>
+          <h2 class="card-title">Criar conte&uacute;do</h2>
           <div class="mode-toggle">
-            <button class="mode-btn active" id="btnPos" onclick="setMode('pos')">📦 Pós</button>
-            <button class="mode-btn" id="btnPre" onclick="setMode('pre')">🎯 Pré</button>
+            <button class="mode-btn active" id="btnPos" onclick="setMode('pos')">P&oacute;s</button>
+            <button class="mode-btn" id="btnPre" onclick="setMode('pre')">Pr&eacute;</button>
           </div>
         </div>
-        <p class="mode-hint" id="modeHint">Pós-produção — gere todos os assets para um vídeo já gravado</p>
+        <p class="mode-hint" id="modeHint">P&oacute;s-produ&ccedil;&atilde;o &mdash; gere todos os assets para um v&iacute;deo j&aacute; gravado</p>
         <textarea
           id="temaInput"
           class="tema-textarea"
-          placeholder="Ex: Top 5 jogos mais viciantes de 2025&#10;&#10;Pode ser um título, ideia ou descrição do conteúdo..."
+          placeholder="Ex: Top 5 jogos mais viciantes de 2025&#10;&#10;Pode ser um t&iacute;tulo, ideia ou descri&ccedil;&atilde;o do conte&uacute;do..."
           rows="4"
         ></textarea>
         <button class="btn-generate" id="generateBtn" onclick="gerarConteudo()">
-          <span id="generateBtnText">🚀 Gerar Conteúdo</span>
+          <span id="generateBtnText">Gerar conte&uacute;do</span>
         </button>
       </div>
 
-      <!-- BLOCO 2: Tendências -->
+      <!-- BLOCO 2: Tendencias -->
       <div class="card card-trends">
         <div class="card-header">
-          <h2 class="card-title">🔥 Tendências do Dia</h2>
-          <button class="btn-refresh" onclick="loadTrends()" title="Atualizar tendências">↻</button>
+          <h2 class="card-title">Tend&ecirc;ncias do dia</h2>
+          <button class="btn-refresh" onclick="loadTrends()" title="Atualizar tend&ecirc;ncias"> </button>
         </div>
         <div id="trendsList" class="trends-list">
           <div class="empty-msg">Selecione um canal</div>
@@ -116,57 +119,57 @@
       <!-- BLOCO 3: Ideias -->
       <div class="card card-ideas">
         <div class="card-header">
-          <h2 class="card-title">💡 Ideias Salvas</h2>
+          <h2 class="card-title">Ideias salvas</h2>
           <button class="btn-add-small" onclick="openModal('ideiaModal')" title="Nova ideia">+</button>
         </div>
         <div id="ideiasDash" class="ideas-dash">
           <div class="empty-msg">Selecione um canal</div>
         </div>
-        <a class="link-ver-todos" onclick="showPage('ideias')">Ver todas as ideias →</a>
+        <a class="link-ver-todos" onclick="showPage('ideias')">Ver todas as ideias</a>
       </div>
 
-      <!-- BLOCO 4: Últimos Conteúdos -->
+      <!-- BLOCO 4: &Uacute;ltimos Conte&uacute;dos -->
       <div class="card card-recent">
         <div class="card-header">
-          <h2 class="card-title">📋 Recentes</h2>
-          <a class="link-ver-todos-inline" onclick="showPage('historico')">Ver todos →</a>
+          <h2 class="card-title">Recentes</h2>
+          <a class="link-ver-todos-inline" onclick="showPage('historico')">Ver todos</a>
         </div>
         <div id="recentList" class="recent-list">
-          <div class="empty-msg">Nenhum conteúdo ainda</div>
+          <div class="empty-msg">Nenhum conte&uacute;do ainda</div>
         </div>
       </div>
 
     </div><!-- /dashboard-grid -->
 
-    <!-- ÁREA DE RESULTADO -->
+    <!-- AREA DE RESULTADO -->
     <div id="resultsSection" class="results-section" style="display:none">
       <div class="results-header">
         <div class="results-title-group">
-          <h2 class="results-title">✨ Conteúdo Gerado</h2>
+          <h2 class="results-title">Conte&uacute;do gerado</h2>
           <span class="results-meta" id="resultsMeta"></span>
         </div>
-        <button class="btn-close-results" onclick="closeResults()">✕ Fechar</button>
+        <button class="btn-close-results" onclick="closeResults()">Fechar</button>
       </div>
 
       <div id="demoWarning" class="demo-banner" style="display:none">
-        ⚠️ <strong>Modo Demonstração</strong> — Configure sua chave de API em
-        <a onclick="showPage('config')" style="cursor:pointer;color:var(--accent)">⚙️ Configurações</a>
-        para gerar conteúdo real com IA. Google Gemini é gratuito!
+        <strong>Modo demonstra&ccedil;&atilde;o</strong> &mdash; Configure sua chave de API em
+        <a onclick="showPage('config')" style="cursor:pointer;color:var(--accent)">Configura&ccedil;&otilde;es</a>
+        para gerar conte&uacute;do real com IA. Google Gemini &eacute; gratuito!
       </div>
 
       <div class="tabs-wrapper">
         <div class="tabs" id="resultsTabs">
-          <button class="tab active" data-tab="youtube"   onclick="switchTab('youtube')">📹 YouTube</button>
-          <button class="tab" data-tab="instagram" onclick="switchTab('instagram')">📸 Instagram</button>
-          <button class="tab" data-tab="x_twitter" onclick="switchTab('x_twitter')">🐦 X/Thread</button>
-          <button class="tab" data-tab="linkedin"  onclick="switchTab('linkedin')">💼 LinkedIn</button>
-          <button class="tab" data-tab="facebook"  onclick="switchTab('facebook')">📘 Facebook</button>
-          <button class="tab" data-tab="short_reel" onclick="switchTab('short_reel')">✂️ Short/Reel</button>
-          <button class="tab" data-tab="tiktok"    onclick="switchTab('tiktok')">🎵 TikTok</button>
-          <button class="tab" data-tab="telegram"  onclick="switchTab('telegram')">✈️ Telegram</button>
-          <button class="tab" data-tab="thumbnail" onclick="switchTab('thumbnail')">🖼️ Thumbnail</button>
-          <button class="tab" data-tab="blog"      onclick="switchTab('blog')">📝 Blog</button>
-          <button class="tab tab-roteiro" data-tab="roteiro_completo" onclick="switchTab('roteiro_completo')" style="display:none">🎬 Roteiro</button>
+          <button class="tab active" data-tab="youtube"   onclick="switchTab('youtube')">YouTube</button>
+          <button class="tab" data-tab="instagram" onclick="switchTab('instagram')">Instagram</button>
+          <button class="tab" data-tab="x_twitter" onclick="switchTab('x_twitter')">X/Thread</button>
+          <button class="tab" data-tab="linkedin"  onclick="switchTab('linkedin')">LinkedIn</button>
+          <button class="tab" data-tab="facebook"  onclick="switchTab('facebook')">Facebook</button>
+          <button class="tab" data-tab="short_reel" onclick="switchTab('short_reel')">Short/Reel</button>
+          <button class="tab" data-tab="tiktok"    onclick="switchTab('tiktok')">TikTok</button>
+          <button class="tab" data-tab="telegram"  onclick="switchTab('telegram')">Telegram</button>
+          <button class="tab" data-tab="thumbnail" onclick="switchTab('thumbnail')">Thumbnail</button>
+          <button class="tab" data-tab="blog"      onclick="switchTab('blog')">Blog</button>
+          <button class="tab tab-roteiro" data-tab="roteiro_completo" onclick="switchTab('roteiro_completo')" style="display:none">Roteiro</button>
         </div>
       </div>
 
@@ -175,38 +178,62 @@
 
   </div><!-- /page-dashboard -->
 
-  <!-- ░░░ GESTÃO DE CANAIS ░░░ -->
+  <!--  GESTOO DE CANAIS  -->
   <div id="page-canais" class="page">
     <div class="page-header">
       <div>
-        <h1>📺 Gestão de Canais</h1>
-        <p class="page-subtitle">Acompanhe as métricas e o status de produção dos seus canais</p>
+        <h1>Gest&atilde;o de Canais</h1>
+        <p class="page-subtitle">Acompanhe as m&eacute;tricas e o status de produ&ccedil;&atilde;o dos seus canais</p>
       </div>
     </div>
     <div id="gestaoCanaisGrid" class="channels-grid">
-      <!-- Cards serão injetados aqui -->
+      <!-- Cards serao injetados aqui -->
     </div>
   </div>
 
-  <!-- ░░░ HISTÓRICO ░░░ -->
+  <!--  HISTRICO  -->
   <div id="page-historico" class="page">
     <div class="page-header">
       <div>
-        <h1>📚 Histórico</h1>
-        <p class="page-subtitle">Todos os conteúdos gerados</p>
+        <h1>Hist&oacute;rico</h1>
+        <p class="page-subtitle">Todos os conte&uacute;dos gerados</p>
       </div>
     </div>
     <div id="historicoList" class="history-list">
-      <div class="empty-msg centered">Nenhum conteúdo gerado ainda.</div>
+      <div class="empty-msg centered">Nenhum conte&uacute;do gerado ainda.</div>
     </div>
   </div>
 
-  <!-- ░░░ IDEIAS ░░░ -->
+  <!--  EXTRAIR CORTES  -->
+  <div id="page-cortes" class="page">
+    <div class="page-header">
+      <div>
+        <h1>Garimpo de Cortes</h1>
+        <p class="page-subtitle">Encontre os melhores trechos de um v&iacute;deo do YouTube</p>
+      </div>
+    </div>
+    
+    <div class="card card-create">
+      <div class="form-group">
+        <label class="form-label">URL do Video</label>
+        <input type="text" id="urlCortesInput" class="form-control" placeholder="https://youtube.com/watch?v=..." />
+      </div>
+      <button class="btn-generate" id="btnExtrairCortes" onclick="extrairCortes()">
+        <span class="btn-text">Extrair Melhores Cortes</span>
+      </button>
+    </div>
+    
+    <div id="cortesResultArea" class="history-list" style="margin-top: 2rem;">
+      <div class="empty-msg centered">Cole uma URL para come&ccedil;ar o garimpo.</div>
+    </div>
+  </div>
+
+  <!--  IDEIAS  -->
   <div id="page-ideias" class="page">
     <div class="page-header">
       <div>
-        <h1>💡 Ideias</h1>
-        <p class="page-subtitle">Suas ideias de conteúdo</p>
+        <h1>Ideias</h1>
+        <p class="page-subtitle">Suas ideias de conte&uacute;do</p>
       </div>
       <button class="btn-primary-sm" onclick="openModal('ideiaModal')">+ Nova Ideia</button>
     </div>
@@ -215,26 +242,26 @@
     </div>
   </div>
 
-  <!-- ░░░ CONFIGURAÇÕES ░░░ -->
+  <!--  CONFIGURA!"ES  -->
   <div id="page-config" class="page">
     <div class="page-header">
       <div>
-        <h1>⚙️ Configurações</h1>
+        <h1>Configura&ccedil;&otilde;es</h1>
         <p class="page-subtitle">Configure seu provedor de IA</p>
       </div>
     </div>
 
     <div class="config-card">
-      <h3 class="config-section-title">🤖 Provedor de Inteligência Artificial</h3>
+      <h3 class="config-section-title">Provedor de Intelig&ecirc;ncia Artificial</h3>
 
       <div class="config-grid">
         <div class="form-group">
           <label class="form-label">Provedor</label>
           <select id="cfgProvider" class="form-control" onchange="onProviderChange()">
-            <option value="demo">Demo (sem API — apenas visualização)</option>
-            <option value="gemini">Google Gemini (Recomendado — Gratuito)</option>
+            <option value="demo">Demo (sem API &mdash; apenas visualiza&ccedil;&atilde;o)</option>
+            <option value="gemini">Google Gemini (Recomendado &mdash; Gratuito)</option>
             <option value="openai">OpenAI GPT (Pago)</option>
-            <option value="ollama">Ollama (Local — 100% Gratuito)</option>
+            <option value="ollama">Ollama (Local &mdash; 100% Gratuito)</option>
           </select>
         </div>
       </div>
@@ -245,16 +272,16 @@
           <div class="form-group">
             <label class="form-label">Modelo Gemini</label>
             <select id="cfgGeminiModel" class="form-control">
-              <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite — Rápido, leve e disponível ⚡</option>
-              <option value="gemini-3.5-flash">gemini-3.5-flash — Rápido (Alta Demanda ⚠️)</option>
-              <option value="gemini-3.5-pro">gemini-3.5-pro — Melhor qualidade</option>
-              <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp — Experimental</option>
+              <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite &mdash; R&aacute;pido, leve e dispon&iacute;vel</option>
+              <option value="gemini-3.5-flash">gemini-3.5-flash &mdash; R&aacute;pido (alta demanda)</option>
+              <option value="gemini-3.5-pro">gemini-3.5-pro  Melhor qualidade</option>
+              <option value="gemini-2.0-flash-exp">gemini-2.0-flash-exp  Experimental</option>
             </select>
           </div>
           <div class="form-group">
             <label class="form-label">
               Chave de API Gemini
-              <a href="https://makersuite.google.com/app/apikey" target="_blank" class="link-get-key">Obter chave gratuita →</a>
+              <a href="https://makersuite.google.com/app/apikey" target="_blank" class="link-get-key">Obter chave gratuita</a>
             </label>
             <input type="password" id="cfgGeminiKey" class="form-control" placeholder="AIza..." autocomplete="off" />
             <small class="form-hint" id="geminiKeyStatus"></small>
@@ -268,14 +295,14 @@
           <div class="form-group">
             <label class="form-label">Modelo OpenAI</label>
             <select id="cfgOpenaiModel" class="form-control">
-              <option value="gpt-4o-mini">gpt-4o-mini — Rápido e econômico ⚡</option>
-              <option value="gpt-4o">gpt-4o — Melhor qualidade</option>
+              <option value="gpt-4o-mini">gpt-4o-mini &mdash; R&aacute;pido e econ&ocirc;mico</option>
+              <option value="gpt-4o">gpt-4o  Melhor qualidade</option>
             </select>
           </div>
           <div class="form-group">
             <label class="form-label">
               Chave de API OpenAI
-              <a href="https://platform.openai.com/api-keys" target="_blank" class="link-get-key">Obter chave →</a>
+              <a href="https://platform.openai.com/api-keys" target="_blank" class="link-get-key">Obter chave</a>
             </label>
             <input type="password" id="cfgOpenaiKey" class="form-control" placeholder="sk-..." autocomplete="off" />
             <small class="form-hint" id="openaiKeyStatus"></small>
@@ -296,55 +323,55 @@
           </div>
         </div>
         <div class="info-box">
-          🦙 Para usar o Ollama, instale em <a href="https://ollama.ai" target="_blank">ollama.ai</a> e execute: <code>ollama run llama3</code>
+          Para usar o Ollama, instale em <a href="https://ollama.ai" target="_blank">ollama.ai</a> e execute: <code>ollama run llama3</code>
         </div>
       </div>
 
       <!-- YouTube section -->
       <div id="youtubeSection" class="provider-section">
-        <h4 style="margin-top:20px;margin-bottom:12px;color:var(--text-primary);font-size:14px">📺 Integração com YouTube API</h4>
+        <h4 style="margin-top:20px;margin-bottom:12px;color:var(--text-primary);font-size:14px">Integra&ccedil;&atilde;o com YouTube API</h4>
         <div class="config-grid">
           <div class="form-group">
             <label class="form-label">
               Chave de API do YouTube (Data API v3)
-              <a href="https://console.cloud.google.com/" target="_blank" class="link-get-key">Obter chave →</a>
+              <a href="https://console.cloud.google.com/" target="_blank" class="link-get-key">Obter chave</a>
             </label>
             <input type="password" id="cfgYoutubeKey" class="form-control" placeholder="AIza..." autocomplete="off" />
             <small class="form-hint" id="youtubeKeyStatus"></small>
           </div>
         </div>
         <div class="info-box">
-          ℹ️ Com a chave do YouTube, o Rizoma puxa os inscritos e visualizações reais na sua Gestão de Canais. Gratuito até 10.000 requisições/dia.
+           Com a chave do YouTube, o Rizoma puxa os inscritos e visualiza&ccedil;&otilde;es reais na sua Gest&atilde;o de Canais. Gratuito at&eacute; 10.000 requisi&ccedil;&otilde;es/dia.
         </div>
       </div>
 
-      <button class="btn-save-config" onclick="saveConfig()">💾 Salvar Configurações</button>
+      <button class="btn-save-config" onclick="saveConfig()">Salvar configura&ccedil;&otilde;es</button>
     </div>
 
     <div class="config-card mobile-only-card" id="mobileDataCard" style="display:none">
-      <h3 class="config-section-title">📱 Dados neste iPhone</h3>
+      <h3 class="config-section-title">Dados neste iPhone</h3>
       <p class="mobile-data-description">
-        Canais, ideias e histórico ficam somente neste aparelho. Exporte um backup regularmente,
-        pois limpar os dados do navegador ou remover o aplicativo pode apagá-los.
+        Canais, ideias e hist&oacute;rico ficam somente neste aparelho. Exporte um backup regularmente,
+        pois limpar os dados do navegador ou remover o aplicativo pode apag&aacute;-los.
       </p>
-      <div class="storage-status" id="storageStatus">Verificando proteção do armazenamento…</div>
+      <div class="storage-status" id="storageStatus">Verificando prote&ccedil;&atilde;o do armazenamento</div>
       <div class="backup-actions">
-        <button class="btn-secondary-sm" type="button" onclick="exportMobileBackup()">⬇️ Exportar backup</button>
-        <label class="btn-primary-sm backup-file-label" for="backupFileInput">⬆️ Importar backup</label>
+        <button class="btn-secondary-sm" type="button" onclick="exportMobileBackup()">! Exportar backup</button>
+        <label class="btn-primary-sm backup-file-label" for="backupFileInput">  Importar backup</label>
         <input id="backupFileInput" type="file" accept="application/json,.json" onchange="importMobileBackup(this)" hidden />
       </div>
-      <small class="form-hint">O arquivo não contém suas chaves de API.</small>
+      <small class="form-hint">O arquivo n&atilde;o cont&eacute;m suas chaves de API.</small>
     </div>
 
     <div class="config-card">
-      <h3 class="config-section-title">📖 Como Configurar</h3>
+      <h3 class="config-section-title">Como configurar</h3>
       <div class="how-to">
         <div class="how-to-item">
           <div class="how-to-num">1</div>
           <div>
             <strong>Google Gemini (Recomendado)</strong><br>
             Acesse <a href="https://makersuite.google.com/app/apikey" target="_blank">makersuite.google.com</a>,
-            faça login com sua conta Google, crie uma chave gratuita e cole aqui. Sem cartão de crédito necessário.
+            fa&ccedil;a login com sua conta Google, crie uma chave gratuita e cole aqui. Sem cart&atilde;o de cr&eacute;dito necess&aacute;rio.
           </div>
         </div>
         <div class="how-to-item">
@@ -352,7 +379,7 @@
           <div>
             <strong>OpenAI GPT</strong><br>
             Acesse <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a>,
-            crie uma chave e adicione crédito na sua conta. O modelo <code>gpt-4o-mini</code> é o mais econômico.
+            crie uma chave e adicione cr&eacute;dito na sua conta. O modelo <code>gpt-4o-mini</code> &eacute; o mais econ&ocirc;mico.
           </div>
         </div>
         <div class="how-to-item">
@@ -370,7 +397,7 @@
 </main><!-- /main-content -->
 
 
-<!-- ═══════════════════════════════════════════════════════════ MODAIS -->
+<!-- """"""""""""""""""""""""""""""""""""""""""""""""""""""""""" MODAIS -->
 
 <!-- Modal: Canal -->
 <div id="channelModal" class="modal" style="display:none">
@@ -378,25 +405,25 @@
   <div class="modal-box">
     <div class="modal-header">
       <h2 id="channelModalTitle">Novo Canal</h2>
-      <button class="btn-modal-close" onclick="closeModal('channelModal')">✕</button>
+      <button class="btn-modal-close" onclick="closeModal('channelModal')">&times;</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="channelId" />
 
       <div class="form-group">
         <label class="form-label">Nome do canal <span class="required">*</span></label>
-        <input type="text" id="channelNome" class="form-control" placeholder="Ex: Games com João, TechBrasil..." />
+        <input type="text" id="channelNome" class="form-control" placeholder="Ex: Games com Joao, TechBrasil..." />
       </div>
       <div class="form-group">
         <label class="form-label">Nicho <span class="required">*</span></label>
-        <input type="text" id="channelNicho" class="form-control" placeholder="Ex: Games, Tecnologia, Reflexões, Marketing..." />
+        <input type="text" id="channelNicho" class="form-control" placeholder="Ex: Games, Tecnologia, Reflexoes, Marketing..." />
       </div>
       <div class="form-group">
         <label class="form-label">Tom de voz <span class="required">*</span></label>
-        <input type="text" id="channelTom" class="form-control" placeholder="Ex: Descontraído e informativo, Técnico mas acessível..." />
+        <input type="text" id="channelTom" class="form-control" placeholder="Ex: Descontraido e informativo, Tecnico mas acessivel..." />
       </div>
       <div class="form-group">
-        <label class="form-label">Público-alvo <span class="required">*</span></label>
+        <label class="form-label">Publico-alvo <span class="required">*</span></label>
         <input type="text" id="channelPublico" class="form-control" placeholder="Ex: Jovens de 18-30 que gostam de games e tecnologia..." />
       </div>
       <div class="form-group">
@@ -419,7 +446,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn-secondary-sm" onclick="closeModal('channelModal')">Cancelar</button>
-      <button class="btn-primary-sm" onclick="saveChannel()">💾 Salvar Canal</button>
+      <button class="btn-primary-sm" onclick="saveChannel()">Salvar canal</button>
     </div>
   </div>
 </div>
@@ -429,40 +456,40 @@
   <div class="modal-overlay" onclick="closeModal('ideiaModal')"></div>
   <div class="modal-box modal-sm">
     <div class="modal-header">
-      <h2>💡 Nova Ideia</h2>
-      <button class="btn-modal-close" onclick="closeModal('ideiaModal')">✕</button>
+      <h2>Nova ideia</h2>
+      <button class="btn-modal-close" onclick="closeModal('ideiaModal')">&times;</button>
     </div>
     <div class="modal-body">
       <div class="form-group">
         <label class="form-label">Tema da ideia</label>
         <textarea id="ideiaText" class="form-control" rows="3"
-          placeholder="Descreva sua ideia de conteúdo..."></textarea>
+          placeholder="Descreva sua ideia de conte&uacute;do..."></textarea>
       </div>
       <div class="form-group">
         <label class="form-label">Potencial</label>
         <div class="star-rating" id="starRating">
-          <span class="star active" data-val="1" onclick="setStars(1)">★</span>
-          <span class="star active" data-val="2" onclick="setStars(2)">★</span>
-          <span class="star active" data-val="3" onclick="setStars(3)">★</span>
-          <span class="star" data-val="4" onclick="setStars(4)">★</span>
-          <span class="star" data-val="5" onclick="setStars(5)">★</span>
+          <span class="star active" data-val="1" onclick="setStars(1)">&#9733;</span>
+          <span class="star active" data-val="2" onclick="setStars(2)">&#9733;</span>
+          <span class="star active" data-val="3" onclick="setStars(3)">&#9733;</span>
+          <span class="star" data-val="4" onclick="setStars(4)">&#9733;</span>
+          <span class="star" data-val="5" onclick="setStars(5)">&#9733;</span>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn-secondary-sm" onclick="closeModal('ideiaModal')">Cancelar</button>
-      <button class="btn-primary-sm" onclick="saveIdeia()">💾 Salvar</button>
+      <button class="btn-primary-sm" onclick="saveIdeia()">Salvar</button>
     </div>
   </div>
 </div>
 
-<!-- Modal: Histórico Detalhe -->
+<!-- Modal: Historico Detalhe -->
 <div id="histDetailModal" class="modal" style="display:none">
   <div class="modal-overlay" onclick="closeModal('histDetailModal')"></div>
   <div class="modal-box modal-xl">
     <div class="modal-header">
-      <h2 id="histDetailTitle">Conteúdo</h2>
-      <button class="btn-modal-close" onclick="closeModal('histDetailModal')">✕</button>
+      <h2 id="histDetailTitle">Conte&uacute;do</h2>
+      <button class="btn-modal-close" onclick="closeModal('histDetailModal')">&times;</button>
     </div>
     <div class="modal-body" id="histDetailBody"></div>
   </div>
