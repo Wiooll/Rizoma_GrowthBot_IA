@@ -13,7 +13,6 @@ COPY backend ./backend
 COPY frontend ./frontend
 COPY public ./public
 COPY data ./data
-COPY config.yaml .
 COPY rizoma.py .
 
 EXPOSE 8000

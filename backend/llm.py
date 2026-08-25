@@ -14,10 +14,34 @@ CONFIG_PATH = Path("config.yaml")
 # ─── Config ───────────────────────────────────────────────────────────────────
 
 def load_config() -> dict:
+    config = {}
     if CONFIG_PATH.exists():
         with open(CONFIG_PATH, encoding="utf-8") as f:
-            return yaml.safe_load(f) or {}
-    return {"llm": {"provider": "demo"}}
+            config = yaml.safe_load(f) or {}
+            
+    if "llm" not in config:
+        config["llm"] = {"provider": "demo"}
+        
+    import os
+    env_map = {
+        "GEMINI_API_KEY": "gemini_api_key",
+        "GEMINI_MODEL": "gemini_model",
+        "OLLAMA_MODEL": "ollama_model",
+        "OLLAMA_URL": "ollama_url",
+        "OPENAI_API_KEY": "openai_api_key",
+        "OPENAI_MODEL": "openai_model",
+        "LLM_PROVIDER": "provider",
+        "YOUTUBE_API_KEY": "youtube_api_key"
+    }
+    
+    for env_k, conf_k in env_map.items():
+        if val := os.environ.get(env_k):
+            config["llm"][conf_k] = val
+            
+    if "provider" not in config["llm"] or not config["llm"]["provider"]:
+        config["llm"]["provider"] = "demo"
+            
+    return config
 
 
 def save_config(config: dict):
