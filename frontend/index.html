@@ -456,6 +456,26 @@
   </div>
 </div>
 
+<!-- Modal: Confirmar Exclusão de Canal -->
+<div id="deleteChannelModal" class="modal" style="display:none">
+  <div class="modal-overlay" onclick="closeModal('deleteChannelModal')"></div>
+  <div class="modal-box modal-sm">
+    <div class="modal-header">
+      <h2>🗑️ Excluir Canal</h2>
+      <button class="btn-modal-close" onclick="closeModal('deleteChannelModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom:0.75rem">Tem certeza que deseja excluir o canal:</p>
+      <p style="font-weight:600;font-size:1.05rem;margin-bottom:0.75rem" id="deleteChannelName"></p>
+      <p style="font-size:0.875rem;color:var(--text-muted)">Esta ação é permanente e removerá todos os conteúdos e ideias vinculados a este canal.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary-sm" onclick="closeModal('deleteChannelModal')">Cancelar</button>
+      <button class="btn-danger-sm" id="confirmDeleteChannelBtn" onclick="executeDeleteCanal()">🗑️ Confirmar Exclusão</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Histórico Detalhe -->
 <div id="histDetailModal" class="modal" style="display:none">
   <div class="modal-overlay" onclick="closeModal('histDetailModal')"></div>

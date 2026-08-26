@@ -278,6 +278,7 @@ function renderGestaoCanais() {
           <button class="btn-secondary-sm" onclick="selectChannelAndShow(${c.id}, 'dashboard')">Produzir</button>
           <button class="btn-secondary-sm" onclick="selectChannelAndShow(${c.id}, 'historico')">Histórico</button>
           <button class="btn-primary-sm" onclick="selectChannelAndShow(${c.id}, 'dashboard');openEditChannel()">Editar</button>
+          <button class="btn-danger-sm" onclick="confirmDeleteCanal(${c.id}, '${escapeHtml(c.nome).replace(/'/g, '&#39;')}')">🗑️ Excluir</button>
         </div>
       </div>
     `;
@@ -317,6 +318,53 @@ async function fetchYoutubeStats(canalId, cardId) {
     document.getElementById(`${cardId}_subs`).textContent = 'Erro';
     document.getElementById(`${cardId}_views`).textContent = 'Erro';
     document.getElementById(`${cardId}_vids`).textContent = 'Erro';
+  }
+}
+
+// ─── Excluir Canal ───────────────────────────────────────────────────────────────────────────
+let _pendingDeleteId = null;
+
+function confirmDeleteCanal(id, nome) {
+  _pendingDeleteId = id;
+  document.getElementById('deleteChannelName').textContent = nome;
+  document.getElementById('deleteChannelModal').style.display = 'flex';
+}
+
+async function executeDeleteCanal() {
+  if (!_pendingDeleteId) return;
+  const id = _pendingDeleteId;
+  _pendingDeleteId = null;
+  closeModal('deleteChannelModal');
+
+  try {
+    // api.del roteia automaticamente para o IndexedDB (RizomaMobile) no modo hosted,
+    // e para o backend FastAPI no modo local — ambos aplicam cascata de conteúdos e ideias.
+    await api.del(`/api/canais/${id}`);
+
+    // Determina próximo canal a selecionar antes de recarregar
+    const wasActive = state.currentChannel?.id === id;
+    const remaining = state.channels.filter(c => c.id !== id);
+    const nextId = wasActive && remaining.length > 0 ? String(remaining[0].id) : null;
+
+    // Recarrega lista de canais
+    state.channels = await api.get('/api/canais');
+    renderChannelSelect();
+
+    if (wasActive) {
+      if (nextId) {
+        document.getElementById('channelSelect').value = nextId;
+        localStorage.setItem('rizoma_canal', nextId);
+      } else {
+        document.getElementById('channelSelect').value = '';
+        localStorage.removeItem('rizoma_canal');
+      }
+      onChannelChange();
+    }
+
+    renderGestaoCanais();
+    showToast('Canal excluído com sucesso.');
+  } catch (e) {
+    showToast(e.message || 'Erro ao excluir canal.', 'error');
   }
 }
 
