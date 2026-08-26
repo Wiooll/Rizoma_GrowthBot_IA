@@ -1126,6 +1126,19 @@ textarea.form-control { resize: vertical; line-height: 1.5; }
 }
 .btn-secondary-sm:hover { border-color: var(--text-secondary); color: var(--text-primary); }
 
+.btn-danger-sm {
+  background: transparent;
+  color: #e05c5c;
+  border: 1px solid #e05c5c44;
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all var(--transition);
+}
+.btn-danger-sm:hover { background: #e05c5c18; border-color: #e05c5c; color: #ff6b6b; }
+
 /* ─── Stars ──────────────────────────────────────────────── */
 .star-rating { display: flex; gap: 4px; }
 
